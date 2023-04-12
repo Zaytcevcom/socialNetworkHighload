@@ -10,6 +10,7 @@ use DomainException;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'users')]
+#[ORM\Index(fields: ['firstName', 'secondName'], name: 'IDX_SEARCH')]
 class User
 {
     #[ORM\Id]
@@ -27,7 +28,7 @@ class User
     private string $secondName;
 
     #[ORM\Column(type: 'integer', nullable: true)]
-    private ?int $sex = null;
+    private ?int $sex;
 
     #[ORM\Column(type: 'date_immutable')]
     private DateTimeImmutable $birthdate;
@@ -136,12 +137,12 @@ class User
         $this->sex = $sex;
     }
 
-    public function getBirthdate(): string
+    public function getBirthdate(): DateTimeImmutable
     {
         return $this->birthdate;
     }
 
-    public function setBirthdate(string $birthdate): void
+    public function setBirthdate(DateTimeImmutable $birthdate): void
     {
         $this->birthdate = $birthdate;
     }

@@ -27,7 +27,7 @@ final class IdentitySearchFetcher
 
         if (!empty($query->search)) {
             $sqlQuery
-                ->andWhere('first_name LIKE :search OR second_name LIKE :search')
+                ->andWhere('first_name LIKE :search && second_name LIKE :search')
                 ->setParameter('search', $query->search . '%');
         }
 
@@ -39,6 +39,6 @@ final class IdentitySearchFetcher
 
         $rows = $result->fetchAllAssociative();
 
-        return new ResultCountItems(AllCount::get($sqlQuery, 'rate'), $rows);
+        return new ResultCountItems(AllCount::get($sqlQuery), $rows);
     }
 }

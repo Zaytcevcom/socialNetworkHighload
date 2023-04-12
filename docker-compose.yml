@@ -83,8 +83,8 @@ services:
         environment:
             MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
             MYSQL_DATABASE: ${DB_NAME}
-#        volumes:
-#            - ./var/mysql:/var/lib/mysql/data
+        volumes:
+            - ./var/mysql:/var/lib/mysql
         networks:
             - app-network
 

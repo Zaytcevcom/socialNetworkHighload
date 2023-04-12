@@ -18,33 +18,33 @@ final class FeatureMonologProcessorTest extends TestCase
         );
         //     $context = $this->createStub(FeaturesContext::class);
 
-    //     $context->method('getAllEnabled')->willReturn($source = ['ONE', 'TWO']);
+        //     $context->method('getAllEnabled')->willReturn($source = ['ONE', 'TWO']);
 
-    //     $processor = new FeaturesMonologProcessor($context);
+        //     $processor = new FeaturesMonologProcessor($context);
 
-    //     $date = new DateTimeImmutable();
+        //     $date = new DateTimeImmutable();
 
-    //     $result = $processor([
-    //         'message' => 'Message',
-    //         'context' => ['name' => 'value'],
-    //         'level' => Level::Warning,
-    //         'level_name' => 'WARNING',
-    //         'channel' => 'channel',
-    //         'datetime' => $date,
-    //         'extra' => ['param' => 'value'],
-    //     ]);
+        //     $result = $processor([
+        //         'message' => 'Message',
+        //         'context' => ['name' => 'value'],
+        //         'level' => Level::Warning,
+        //         'level_name' => 'WARNING',
+        //         'channel' => 'channel',
+        //         'datetime' => $date,
+        //         'extra' => ['param' => 'value'],
+        //     ]);
 
-    //     self::assertEquals([
-    //         'message' => 'Message',
-    //         'context' => ['name' => 'value'],
-    //         'level' => Level::Warning,
-    //         'level_name' => 'WARNING',
-    //         'channel' => 'channel',
-    //         'datetime' => $date,
-    //         'extra' => [
-    //             'param' => 'value',
-    //             'features' => $source,
-    //         ],
-    //     ], $result);
+        //     self::assertEquals([
+        //         'message' => 'Message',
+        //         'context' => ['name' => 'value'],
+        //         'level' => Level::Warning,
+        //         'level_name' => 'WARNING',
+        //         'channel' => 'channel',
+        //         'datetime' => $date,
+        //         'extra' => [
+        //             'param' => 'value',
+        //             'features' => $source,
+        //         ],
+        //     ], $result);
     }
 }

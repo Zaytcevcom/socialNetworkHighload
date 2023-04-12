@@ -70,7 +70,7 @@ final class SearchAction implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $identity = Authenticate::getIdentity($request);
+        $identity = Authenticate::findIdentity($request);
 
         $query = $this->denormalizer->denormalize($request->getQueryParams(), IdentitySearchQuery::class);
 
@@ -80,7 +80,7 @@ final class SearchAction implements RequestHandlerInterface
 
         return new JsonDataItemsResponse(
             count: $result->count,
-            items: $this->unifier->unify($identity->id, $result->items)
+            items: $this->unifier->unify($identity?->id, $result->items)
         );
     }
 }
