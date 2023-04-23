@@ -9,6 +9,10 @@ RUN apk update && apk add --no-cache unzip bash coreutils git zip libzip-dev \
     && docker-php-ext-install pdo pdo_mysql sockets bcmath zip \
     && apk del git
 
+RUN apk add --no-cache pcre-dev $PHPIZE_DEPS \
+    && pecl install redis \
+    && docker-php-ext-enable redis.so
+
 # https://releasecandidate.dev/posts/2020/how-to-install-php-ext-intl-on-alpine-docker/
 RUN set -xe \
     && apk add --update \

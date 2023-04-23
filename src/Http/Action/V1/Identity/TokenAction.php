@@ -38,12 +38,12 @@ use Psr\Http\Server\RequestHandlerInterface;
                 new OA\Property(
                     property: 'username',
                     type: 'string',
-                    example: '79999999999'
+                    example: 'demo'
                 ),
                 new OA\Property(
                     property: 'password',
                     type: 'string',
-                    example: '12345678'
+                    example: '1234567890'
                 ),
             ]
         )

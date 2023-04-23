@@ -34,6 +34,14 @@ use Psr\Http\Server\RequestHandlerInterface;
     name: 'Users',
     description: 'Пользователи'
 )]
+#[OA\Tag(
+    name: 'Friends',
+    description: 'Друзья'
+)]
+#[OA\Tag(
+    name: 'Posts',
+    description: 'Посты'
+)]
 final class OpenApiAction implements RequestHandlerInterface
 {
     public function handle(Request $request): Response

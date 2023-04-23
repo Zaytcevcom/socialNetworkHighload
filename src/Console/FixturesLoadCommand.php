@@ -46,13 +46,17 @@ final class FixturesLoadCommand extends Command
             $loader->loadFromDirectory($path);
         }
 
-        $executor = new ORMExecutor($this->em, new ORMPurger());
+        $ORMPurger = new ORMPurger($this->em);
+        $ORMPurger->setPurgeMode(ORMPurger::PURGE_MODE_TRUNCATE);
+        $ORMPurger->purge();
+
+        $executor = new ORMExecutor($this->em);
 
         $executor->setLogger(static function (string $message) use ($output): void {
             $output->writeln($message);
         });
 
-        $executor->execute($loader->getFixtures());
+        $executor->execute($loader->getFixtures(), true);
 
         $output->writeln('<info>Done!</info>');
 

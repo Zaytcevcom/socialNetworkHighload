@@ -2,6 +2,7 @@ version: "3.9"
 services:
 
     gateway:
+        container_name: hl-gateway
         build:
             context: docker
             dockerfile: development/gateway/Dockerfile
@@ -10,9 +11,10 @@ services:
         depends_on:
             - nginx
         networks:
-            - app-network
+            - hl-network
 
     nginx:
+        container_name: hl-nginx
         build:
             context: docker
             dockerfile: development/nginx/Dockerfile
@@ -21,9 +23,10 @@ services:
         depends_on:
             - php-fpm
         networks:
-            - app-network
+            - hl-network
 
     php-fpm:
+        container_name: hl-php-fpm
         build:
             context: docker
             dockerfile: development/php-fpm/Dockerfile
@@ -48,9 +51,10 @@ services:
             - jwt_public_key
             - jwt_private_key
         networks:
-            - app-network
+            - hl-network
 
     php-cli:
+        container_name: hl-php-cli
         build:
             context: docker
             dockerfile: development/php-cli/Dockerfile
@@ -64,19 +68,13 @@ services:
             DB_PASSWORD: ${DB_PASSWORD}
             DB_NAME: ${DB_NAME}
             DB_CHARSET: ${DB_CHARSET}
-            JWT_ENCRYPTION_KEY: /run/secrets/jwt_encryption_key
-            JWT_PUBLIC_KEY_PATH: /run/secrets/jwt_public_key
-            JWT_PRIVATE_KEY_PATH: /run/secrets/jwt_private_key
         volumes:
             - .:/app
-        secrets:
-            - jwt_encryption_key
-            - jwt_public_key
-            - jwt_private_key
         networks:
-            - app-network
+            - hl-network
 
     db:
+        container_name: hl-mysql
         image: mysql
         ports:
             - "8887:3306"
@@ -86,23 +84,103 @@ services:
         volumes:
             - ./var/mysql:/var/lib/mysql
         networks:
-            - app-network
+            - hl-network
 
     phpmyadmin:
+        container_name: hl-phpmyadmin
         image: phpmyadmin
         environment:
-            - PMA_ARBITRARY=1
-            - UPLOAD_LIMIT=500M
+            PMA_ARBITRARY: 1
+            UPLOAD_LIMIT: 500M
         ports:
             - "8888:80"
         networks:
-            - app-network
+            - hl-network
 
-volumes:
-    app-mysql:
+    redis:
+        container_name: hl-redis
+        image: redis:latest
+        restart: always
+        entrypoint: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD} --maxmemory 512mb --maxmemory-policy allkeys-lru
+        ports:
+            - "6379:6379"
+        volumes:
+            - ./var/redis:/data
+            - /etc/timezone:/etc/timezone:ro
+            - /etc/localtime:/etc/localtime:ro
+        networks:
+            - hl-network
+
+    rabbitmq:
+        container_name: hl-rabbitmq
+        image: rabbitmq:management
+        restart: always
+        environment:
+            RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+            RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+            RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS: -rabbit log_levels [{connection,error},{default,error}] disk_free_limit 2147483648
+        volumes:
+            - ./var/rabbitmq:/var/lib/rabbitmq
+        ports:
+            - "15672:15672"
+            - "5672:5672"
+        networks:
+            - hl-network
+
+    php-q-refresh-feed-by-user:
+        container_name: hl-q-refresh-feed-by-user
+        restart: always
+        build:
+            context: docker
+            dockerfile: development/php-cli/Dockerfile
+        environment:
+            APP_ENV: ${APP_ENV}
+            APP_DEBUG: ${APP_DEBUG}
+            SENTRY_DSN: ${SENTRY_DSN}
+            DB_DRIVER: ${DB_DRIVER}
+            DB_HOST: ${DB_HOST}
+            DB_USER: ${DB_USER}
+            DB_PASSWORD: ${DB_PASSWORD}
+            DB_NAME: ${DB_NAME}
+            DB_CHARSET: ${DB_CHARSET}
+        volumes:
+            - .:/app
+        networks:
+            - hl-network
+        depends_on:
+            - db
+            - redis
+            - rabbitmq
+        command: composer app posts:consumer-refresh-feed-by-user
+
+    php-q-refresh-feed-by-post:
+        container_name: hl-q-refresh-feed-by-post
+        restart: always
+        build:
+            context: docker
+            dockerfile: development/php-cli/Dockerfile
+        environment:
+            APP_ENV: ${APP_ENV}
+            APP_DEBUG: ${APP_DEBUG}
+            SENTRY_DSN: ${SENTRY_DSN}
+            DB_DRIVER: ${DB_DRIVER}
+            DB_HOST: ${DB_HOST}
+            DB_USER: ${DB_USER}
+            DB_PASSWORD: ${DB_PASSWORD}
+            DB_NAME: ${DB_NAME}
+            DB_CHARSET: ${DB_CHARSET}
+        volumes:
+            - .:/app
+        networks:
+            - hl-network
+        depends_on:
+            - db
+            - redis
+            - rabbitmq
+        command: composer app posts:consumer-refresh-feed-by-post
 
 networks:
-    app-network:
+    hl-network:
         driver: bridge
 
 secrets:

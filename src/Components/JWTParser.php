@@ -41,6 +41,10 @@ class JWTParser
      */
     public function parse(string $jwt): DataSet
     {
+        if (empty($jwt)) {
+            throw OAuthServerException::accessDenied('Jwt expects non empty string');
+        }
+
         try {
             /** @var Plain $token */
             $token = $this->jwtConfiguration->parser()->parse($jwt);

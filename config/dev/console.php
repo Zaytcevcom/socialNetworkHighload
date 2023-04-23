@@ -3,8 +3,11 @@
 declare(strict_types=1);
 
 use App\Console\FixturesLoadCommand;
-use App\Console\GenerateUsersCommand;
+use App\Modules\Identity\Console\GenerateUsersCommand;
 use App\Modules\OAuth\Console\E2ETokenCommand;
+use App\Modules\Post\Console\ConsumerRefreshFeedByPostCommand;
+use App\Modules\Post\Console\ConsumerRefreshFeedByUserCommand;
+use App\Modules\Post\Console\RefreshFeedAllUsersCommand;
 use Doctrine\Migrations;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\Console\Command\SchemaTool;
@@ -41,9 +44,15 @@ return [
                 E2ETokenCommand::class,
 
                 GenerateUsersCommand::class,
+                RefreshFeedAllUsersCommand::class,
+
+                ConsumerRefreshFeedByUserCommand::class,
+                ConsumerRefreshFeedByPostCommand::class,
             ],
             'fixture_paths' => [
                 __DIR__ . '/../../src/Modules/Identity/Fixture',
+                __DIR__ . '/../../src/Modules/Friends/Fixture',
+                __DIR__ . '/../../src/Modules/Post/Fixture',
             ],
         ],
     ],

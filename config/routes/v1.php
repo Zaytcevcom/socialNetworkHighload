@@ -20,6 +20,16 @@ return static function (App $app): void {
         $group->group('/users', new Group(static function (RouteCollectorProxy $group): void {
             $group->get('/search', Action\V1\Users\SearchAction::class);
             $group->get('/{id}', Action\V1\Users\GetByIdAction::class);
+            $group->post('/friends/{id}', Action\V1\Friends\AddAction::class);
+            $group->delete('/friends/{id}', Action\V1\Friends\RemoveAction::class);
+        }));
+
+        $group->group('/posts', new Group(static function (RouteCollectorProxy $group): void {
+            $group->get('/feed', Action\V1\Posts\GetFeedAction::class);
+            $group->get('/{id}', Action\V1\Posts\GetByIdAction::class);
+            $group->put('/{id}', Action\V1\Posts\UpdateAction::class);
+            $group->post('', Action\V1\Posts\CreateAction::class);
+            $group->delete('/{id}', Action\V1\Posts\DeleteAction::class);
         }));
     }));
 };

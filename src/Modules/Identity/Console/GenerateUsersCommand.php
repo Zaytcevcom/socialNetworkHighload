@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Console;
+namespace App\Modules\Identity\Console;
 
 use App\Modules\Identity\Entity\User\User;
 use App\Modules\Identity\Service\PasswordHasher;

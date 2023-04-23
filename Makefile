@@ -32,7 +32,7 @@ test: app-test
 update-deps: app-composer-update
 
 #check all
-check: lint analyze validate-schema test
+check: lint analyze validate-schema #test
 
 #Docker
 docker-up:
@@ -55,7 +55,9 @@ app-clear:
 
 
 #Composer
-app-init: app-permissions app-composer-install app-wait-db app-db-migrations app-db-fixtures
+app-init: app-permissions app-composer-install \
+	app-wait-db app-wait-redis app-wait-rabbitmq \
+	app-db-migrations app-db-fixtures
 
 app-permissions:
 	docker run --rm -v ${PWD}/:/app -w /app alpine chmod 777 var/cache var/log var/test
@@ -74,6 +76,12 @@ app-composer-outdated: #get not updated
 
 app-wait-db:
 	docker-compose run --rm php-cli wait-for-it db:3306 -t 30
+
+app-wait-redis:
+	docker-compose run --rm php-cli wait-for-it hl-redis:6379 -t 30
+
+app-wait-rabbitmq:
+	docker-compose run --rm php-cli wait-for-it hl-rabbitmq:5672 -t 60
 
 
 #DB

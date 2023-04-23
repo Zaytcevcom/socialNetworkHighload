@@ -55,6 +55,10 @@ final class BearerTokenValidator implements AuthorizationValidatorInterface
         $header = $request->getHeader('authorization');
         $jwt = trim((string)preg_replace('/^\s*Bearer\s/', '', $header[0]));
 
+        if (empty($jwt)) {
+            throw OAuthServerException::accessDenied('Jwt expects non empty string');
+        }
+
         try {
             /** @var Plain $token */
             $token = $this->jwtConfiguration->parser()->parse($jwt);

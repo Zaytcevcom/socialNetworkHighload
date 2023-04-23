@@ -20,7 +20,7 @@ final class Version20230412153129 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('CREATE INDEX IDX_SEARCH ON users (first_name, second_name, id)');
+        $this->addSql('CREATE INDEX IDX_SEARCH ON users (first_name, second_name)');
     }
 
     public function down(Schema $schema): void
