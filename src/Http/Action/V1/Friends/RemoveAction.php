@@ -4,23 +4,26 @@ declare(strict_types=1);
 
 namespace App\Http\Action\V1\Friends;
 
-use App\Components\Router\Route;
-use App\Components\Validator\Validator;
-use App\Http\Middleware\Identity\Authenticate;
-use App\Http\Response\JsonDataSuccessResponse;
 use App\Modules\Friends\Command\Remove\FriendshipRemoveCommand;
 use App\Modules\Friends\Command\Remove\FriendshipRemoveHandler;
 use OpenApi\Attributes as OA;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use ZayMedia\Shared\Components\Router\Route;
+use ZayMedia\Shared\Components\Validator\Validator;
+use ZayMedia\Shared\Helpers\OpenApi\ResponseSuccessful;
+use ZayMedia\Shared\Helpers\OpenApi\Security;
+use ZayMedia\Shared\Http\Middleware\Identity\Authenticate;
+use ZayMedia\Shared\Http\Response\JsonDataSuccessResponse;
 
 #[OA\Delete(
     path: '/users/friends/{id}',
     description: 'Удаление пользователя из друзей, отклонение входящей/исходящей заявки в друзья',
     summary: 'Удаление пользователя из друзей, отклонение входящей/исходящей заявки в друзья',
-    security: [['bearerAuth' => '{}']],
-    tags: ['Friends']
+    security: [Security::BEARER_AUTH],
+    tags: ['Friends'],
+    responses: [new ResponseSuccessful()]
 )]
 #[OA\Parameter(
     name: 'id',
@@ -31,10 +34,6 @@ use Psr\Http\Server\RequestHandlerInterface;
         type: 'integer',
         format: 'int64'
     ),
-)]
-#[OA\Response(
-    response: '200',
-    description: 'Successful operation'
 )]
 final class RemoveAction implements RequestHandlerInterface
 {

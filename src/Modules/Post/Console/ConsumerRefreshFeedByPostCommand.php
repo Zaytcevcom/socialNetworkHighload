@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Modules\Post\Console;
 
-use App\Components\Queue\Queue;
 use App\Modules\Friends\Query\GetUserFriendIds\GetUserFriendIdsFetcher;
 use App\Modules\Friends\Query\GetUserFriendIds\GetUserFriendIdsQuery;
 use App\Modules\Post\Command\RefreshFeed\RefreshFeedCommand;
@@ -16,6 +15,7 @@ use Doctrine\DBAL\Exception;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use ZayMedia\Shared\Components\Queue\Queue;
 
 use function App\Components\env;
 
@@ -62,7 +62,7 @@ final class ConsumerRefreshFeedByPostCommand extends Command
             }
         };
 
-        $this->queue->receive(
+        $this->queue->consume(
             PostHelper::getQueueName(PostQueue::REFRESH_FEED_BY_POST),
             $callback
         );

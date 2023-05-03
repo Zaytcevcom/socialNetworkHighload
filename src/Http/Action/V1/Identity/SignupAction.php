@@ -4,15 +4,16 @@ declare(strict_types=1);
 
 namespace App\Http\Action\V1\Identity;
 
-use App\Components\Serializer\Denormalizer;
-use App\Components\Validator\Validator;
-use App\Http\Response\JsonDataResponse;
 use App\Modules\Identity\Command\Signup\IdentitySignupCommand;
 use App\Modules\Identity\Command\Signup\IdentitySignupHandler;
 use OpenApi\Attributes as OA;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use ZayMedia\Shared\Components\Serializer\Denormalizer;
+use ZayMedia\Shared\Components\Validator\Validator;
+use ZayMedia\Shared\Helpers\OpenApi\ResponseSuccessful;
+use ZayMedia\Shared\Http\Response\JsonDataResponse;
 
 #[OA\Post(
     path: '/identity/signup',
@@ -70,11 +71,8 @@ use Psr\Http\Server\RequestHandlerInterface;
             ]
         )
     ),
-    tags: ['Identity']
-)]
-#[OA\Response(
-    response: '200',
-    description: 'Successful operation'
+    tags: ['Identity'],
+    responses: [new ResponseSuccessful()]
 )]
 final class SignupAction implements RequestHandlerInterface
 {

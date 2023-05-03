@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace App\Modules\Identity\Query\GetByIds;
 
-use App\Modules\ResultCountItems;
 use Doctrine\DBAL\Connection;
 
-use function App\Components\Functions\toArrayString;
+use function ZayMedia\Shared\Components\Functions\toArrayString;
 
 final class IdentityGetByIdsFetcher
 {
@@ -16,28 +15,26 @@ final class IdentityGetByIdsFetcher
     ) {
     }
 
-    public function fetch(IdentityGetByIdsQuery $query): ResultCountItems
+    public function fetch(IdentityGetByIdsQuery $query): array
     {
         $ids = toArrayString($query->ids);
 
         if (\count($ids) === 0) {
-            return new ResultCountItems(0, []);
+            return [];
         }
 
         $queryBuilder = $this->connection->createQueryBuilder();
-        $queryBuilder
-            ->select(['*'])
-            ->from('users')
-            ->where($queryBuilder->expr()->in('id', $ids));
 
-        $result = $queryBuilder
-            ->setMaxResults(1000)
-            ->executeQuery();
-
-        $count = $result->rowCount();
-
-        $rows = $result->fetchAllAssociative();
-
-        return new ResultCountItems($count, $rows);
+        try {
+            return $queryBuilder
+                ->select(['*'])
+                ->from('users')
+                ->where($queryBuilder->expr()->in('id', $ids))
+                ->setMaxResults(1000)
+                ->executeQuery()
+                ->fetchAllAssociative();
+        } catch (\Exception) {
+            return [];
+        }
     }
 }

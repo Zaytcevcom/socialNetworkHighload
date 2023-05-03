@@ -18,13 +18,13 @@
         "ext-curl": "*",
         "ext-mbstring": "^8.1",
         "ext-openssl": "*",
+        "ext-redis": "*",
         "centrifugal/phpcent": "^5.0",
         "doctrine/migrations": "^3.5",
         "doctrine/orm": "^2.12",
         "fakerphp/faker": "^1.21",
         "laminas/laminas-config-aggregator": "^1.2",
         "league/oauth2-server": "^8.3",
-        "middlewares/negotiation": "^2.1",
         "monolog/monolog": "^3.0",
         "php-amqplib/php-amqplib": "^3.0",
         "php-di/php-di": "^7.0",
@@ -44,8 +44,8 @@
         "symfony/validator": "^6.1",
         "twig/twig": "^3.4",
         "vlucas/phpdotenv": "^5.4",
-        "zircote/swagger-php": "^4.4",
-        "ext-redis": "*"
+        "zaymedia/shared": "^1.0",
+        "zircote/swagger-php": "^4.4"
     },
     "require-dev": {
         "dg/bypass-finals": "^1.3",
@@ -73,11 +73,7 @@
     },
     "autoload": {
         "files": [
-            "src/Components/env.php",
-            "src/Components/Functions/fieldToArrayString.php",
-            "src/Components/Functions/fieldToArrayInt.php",
-            "src/Components/Functions/fieldToString.php",
-            "src/Components/Functions/fieldToInt.php"
+            "src/Components/env.php"
         ],
         "psr-4": {
             "App\\": "src/"

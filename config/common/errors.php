@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-use App\Components\ErrorHandler\LogErrorHandler;
-use App\Components\ErrorHandler\SentryDecorator;
-use App\Components\Sentry;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Log\LoggerInterface;
 use Slim\Interfaces\CallableResolverInterface;
 use Slim\Middleware\ErrorMiddleware;
+use ZayMedia\Shared\Components\ErrorHandler\LogErrorHandler;
+use ZayMedia\Shared\Components\ErrorHandler\SentryDecorator;
+use ZayMedia\Shared\Components\Sentry;
 
 use function App\Components\env;
 

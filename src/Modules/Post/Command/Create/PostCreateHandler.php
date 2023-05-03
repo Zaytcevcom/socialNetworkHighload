@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Modules\Post\Command\Create;
 
-use App\Components\Flusher;
-use App\Components\Queue\Queue;
 use App\Modules\Identity\Entity\User\UserRepository;
 use App\Modules\Post\Entity\Post\Post;
 use App\Modules\Post\Entity\Post\PostRepository;
 use App\Modules\Post\Helpers\PostHelper;
 use App\Modules\Post\Helpers\PostQueue;
+use ZayMedia\Shared\Components\Flusher;
+use ZayMedia\Shared\Components\Queue\Queue;
 
 final class PostCreateHandler
 {
@@ -42,7 +42,7 @@ final class PostCreateHandler
 
     private function sendToQueueRefreshFeedByPost(int $postId): void
     {
-        $this->queue->send(
+        $this->queue->publish(
             queue: PostHelper::getQueueName(PostQueue::REFRESH_FEED_BY_POST),
             message: ['postId' => $postId]
         );

@@ -9,7 +9,7 @@ final class IdentitySearchQuery
     public function __construct(
         public readonly ?string $search = '',
         public readonly int $count = 100,
-        public readonly int $offset = 0,
+        public readonly ?string $cursor = null,
     ) {
     }
 }

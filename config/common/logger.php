@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-use App\Components\FeatureToggle\FeaturesMonologProcessor;
 use Monolog\Handler\StreamHandler;
 use Monolog\Level;
 use Monolog\Logger;
 use Monolog\Processor\ProcessorInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
+use ZayMedia\Shared\Components\FeatureToggle\FeaturesMonologProcessor;
 
 use function App\Components\env;
 

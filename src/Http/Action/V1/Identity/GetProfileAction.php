@@ -5,26 +5,25 @@ declare(strict_types=1);
 namespace App\Http\Action\V1\Identity;
 
 use App\Http\Action\Unifier\User\UserUnifier;
-use App\Http\Exception\NotFoundExceptionModule;
-use App\Http\Middleware\Identity\Authenticate;
-use App\Http\Response\JsonDataResponse;
 use App\Modules\Identity\Query\GetById\IdentityGetByIdFetcher;
 use App\Modules\Identity\Query\GetById\IdentityGetByIdQuery;
 use OpenApi\Attributes as OA;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use ZayMedia\Shared\Helpers\OpenApi\ResponseSuccessful;
+use ZayMedia\Shared\Helpers\OpenApi\Security;
+use ZayMedia\Shared\Http\Exception\NotFoundExceptionModule;
+use ZayMedia\Shared\Http\Middleware\Identity\Authenticate;
+use ZayMedia\Shared\Http\Response\JsonDataResponse;
 
 #[OA\Get(
     path: '/identity/profile',
     description: 'Получение информации о профиле пользователя',
     summary: 'Получение информации о профиле пользователя',
-    security: [['bearerAuth' => '{}']],
-    tags: ['Identity']
-)]
-#[OA\Response(
-    response: '200',
-    description: 'Successful operation'
+    security: [Security::BEARER_AUTH],
+    tags: ['Identity'],
+    responses: [new ResponseSuccessful()]
 )]
 final class GetProfileAction implements RequestHandlerInterface
 {

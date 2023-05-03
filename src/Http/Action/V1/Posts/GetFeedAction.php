@@ -4,50 +4,30 @@ declare(strict_types=1);
 
 namespace App\Http\Action\V1\Posts;
 
-use App\Components\Serializer\Denormalizer;
-use App\Components\Validator\Validator;
 use App\Http\Action\Unifier\Post\PostUnifier;
-use App\Http\Middleware\Identity\Authenticate;
-use App\Http\Response\JsonDataCursorItemsResponse;
 use App\Modules\Post\Query\Cached\CachedGetFeed\PostCachedGetFeedFetcher;
 use App\Modules\Post\Query\Cached\CachedGetFeed\PostCachedGetFeedQuery;
 use OpenApi\Attributes as OA;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use ZayMedia\Shared\Components\Serializer\Denormalizer;
+use ZayMedia\Shared\Components\Validator\Validator;
+use ZayMedia\Shared\Helpers\OpenApi\ParameterCount;
+use ZayMedia\Shared\Helpers\OpenApi\ParameterCursor;
+use ZayMedia\Shared\Helpers\OpenApi\ResponseSuccessful;
+use ZayMedia\Shared\Helpers\OpenApi\Security;
+use ZayMedia\Shared\Http\Middleware\Identity\Authenticate;
+use ZayMedia\Shared\Http\Response\JsonDataCursorItemsResponse;
 
 #[OA\Get(
     path: '/posts/feed',
     description: 'Получение списка новостей',
     summary: 'Получение списка новостей',
-    security: [['bearerAuth' => '{}']],
-    tags: ['Posts']
-)]
-#[OA\Parameter(
-    name: 'count',
-    description: 'Кол-во которое необходимо получить',
-    in: 'query',
-    required: false,
-    schema: new OA\Schema(
-        type: 'integer',
-        format: 'int64'
-    ),
-    example: 100
-)]
-#[OA\Parameter(
-    name: 'offset',
-    description: 'Смещение',
-    in: 'query',
-    required: false,
-    schema: new OA\Schema(
-        type: 'integer',
-        format: 'int64'
-    ),
-    example: 0
-)]
-#[OA\Response(
-    response: 200,
-    description: 'Successful operation'
+    security: [Security::BEARER_AUTH],
+    tags: ['Posts'],
+    parameters: [new ParameterCursor(), new ParameterCount()],
+    responses: [new ResponseSuccessful()]
 )]
 final class GetFeedAction implements RequestHandlerInterface
 {
@@ -66,10 +46,7 @@ final class GetFeedAction implements RequestHandlerInterface
         $query = $this->denormalizer->denormalizeQuery(
             array_merge(
                 $request->getQueryParams(),
-                [
-                    'userId' => $identity->id,
-                    'startedAt' => time(),
-                ]
+                ['userId' => $identity->id]
             ),
             PostCachedGetFeedQuery::class
         );
@@ -78,10 +55,9 @@ final class GetFeedAction implements RequestHandlerInterface
 
         $result = $this->fetcher->fetch($query);
 
-        $items = $this->unifier->unify($identity->id, $result->items);
-
         return new JsonDataCursorItemsResponse(
-            items: $items,
+            count: $result->count,
+            items: $this->unifier->unify($identity->id, $result->items),
             cursor: $result->cursor
         );
     }

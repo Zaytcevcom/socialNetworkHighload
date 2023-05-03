@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Feed</title>
+    <script src="https://code.jquery.com/jquery-3.6.4.js" integrity="sha256-a9jBBRygX1Bh5lt8GZjXDzyOB+bWve9EiO7tROUtj/E=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ratchet/2.0.2/js/ratchet.min.js"></script>
+    <script>
+        $(function() {
+            const userId = 20;
+
+            $('#userId').html(userId);
+
+            const conn = new WebSocket('ws://localhost/ws/');
+
+            conn.onopen = function(e) {
+                console.log("Соединение установлено!");
+
+                conn.send(msg('subscribe', {channel: getChannel(userId)}));
+            };
+
+            conn.onmessage = function(e) {
+
+                const json = JSON.parse(e.data);
+
+                switch (json.type) {
+                    case 'posted':
+                        console.log(json.payload);
+                        eventNewPost(json.payload);
+                        break;
+                    default:
+                        console.log("Неизвестное сообщение: " + e.data);
+                }
+            };
+        });
+
+        function msg(type, payload) {
+            return JSON.stringify({
+                type: type,
+                payload: payload
+            });
+        }
+
+        function getChannel(userId)
+        {
+            return 'dev-update-feed-' + userId;
+        }
+
+        function eventNewPost(data)
+        {
+            let html = '<div class="post">' + data.text + '</div>';
+
+            $('#posts').prepend(html);
+        }
+    </script>
+    <style>
+        body {
+            padding: 0;
+            margin: 0;
+        }
+
+        #container {
+            width: 600px;
+            margin: 0 auto;
+            border: 1px solid rgb(240, 240, 240);
+        }
+
+        .post {
+            border-radius: 4px;
+            border: 1px solid rgb(240, 240, 240);
+            padding: 16px;
+            margin: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <h1>Последние новости</h1>
+        Идентификатор пользователя: <span id="userId"></span>
+        <div id="posts"></div>
+    </div>
+</body>
+</html>

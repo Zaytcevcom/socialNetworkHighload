@@ -1,27 +1,18 @@
 version: "3.9"
 services:
 
-    gateway:
-        container_name: hl-gateway
-        build:
-            context: docker
-            dockerfile: development/gateway/Dockerfile
-        ports:
-            - "8080:8080"
-        depends_on:
-            - nginx
-        networks:
-            - hl-network
-
     nginx:
         container_name: hl-nginx
         build:
             context: docker
             dockerfile: development/nginx/Dockerfile
+        ports:
+            - "80:80"
         volumes:
             - .:/app
         depends_on:
             - php-fpm
+            - websocket
         networks:
             - hl-network
 
@@ -126,6 +117,19 @@ services:
             - "5672:5672"
         networks:
             - hl-network
+
+    websocket:
+        container_name: hl-websocket
+        restart: always
+        build:
+            context: docker
+            dockerfile: development/node/Dockerfile
+        volumes:
+            - ./WSServer:/app
+        networks:
+            - hl-network
+        depends_on:
+            - rabbitmq
 
     php-q-refresh-feed-by-user:
         container_name: hl-q-refresh-feed-by-user

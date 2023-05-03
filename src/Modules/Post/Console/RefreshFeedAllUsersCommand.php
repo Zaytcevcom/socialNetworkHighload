@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Modules\Post\Console;
 
-use App\Components\Queue\Queue;
 use App\Modules\Identity\Entity\User\User;
 use App\Modules\Post\Helpers\PostHelper;
 use App\Modules\Post\Helpers\PostQueue;
@@ -13,6 +12,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use ZayMedia\Shared\Components\Queue\Queue;
 
 final class RefreshFeedAllUsersCommand extends Command
 {
@@ -75,7 +75,7 @@ final class RefreshFeedAllUsersCommand extends Command
 
     private function sendToQueueRefreshFeedByUser(int $userId): void
     {
-        $this->queue->send(
+        $this->queue->publish(
             queue: PostHelper::getQueueName(PostQueue::REFRESH_FEED_BY_USER),
             message: ['userId' => $userId]
         );

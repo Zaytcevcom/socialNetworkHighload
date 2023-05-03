@@ -4,24 +4,27 @@ declare(strict_types=1);
 
 namespace App\Http\Action\V1\Posts;
 
-use App\Components\Router\Route;
-use App\Components\Validator\Validator;
 use App\Http\Action\Unifier\Post\PostUnifier;
-use App\Http\Middleware\Identity\Authenticate;
-use App\Http\Response\JsonDataResponse;
 use App\Modules\Post\Query\Cached\CachedGetById\PostCachedGetByIdFetcher;
 use App\Modules\Post\Query\Cached\CachedGetById\PostCachedGetByIdQuery;
 use OpenApi\Attributes as OA;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use ZayMedia\Shared\Components\Router\Route;
+use ZayMedia\Shared\Components\Validator\Validator;
+use ZayMedia\Shared\Helpers\OpenApi\ResponseSuccessful;
+use ZayMedia\Shared\Helpers\OpenApi\Security;
+use ZayMedia\Shared\Http\Middleware\Identity\Authenticate;
+use ZayMedia\Shared\Http\Response\JsonDataResponse;
 
 #[OA\Get(
     path: '/posts/{id}',
     description: 'Получение информации о посте по его идентификатору',
     summary: 'Получение информации о посте по его идентификатору',
-    security: [['bearerAuth' => '{}']],
-    tags: ['Posts']
+    security: [Security::BEARER_AUTH],
+    tags: ['Posts'],
+    responses: [new ResponseSuccessful()]
 )]
 #[OA\Parameter(
     name: 'id',
@@ -33,10 +36,6 @@ use Psr\Http\Server\RequestHandlerInterface;
         format: 'int64'
     ),
     example: 1
-)]
-#[OA\Response(
-    response: 200,
-    description: 'Successful operation'
 )]
 final class GetByIdAction implements RequestHandlerInterface
 {

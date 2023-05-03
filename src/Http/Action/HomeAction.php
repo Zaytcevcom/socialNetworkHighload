@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Http\Action;
 
-use App\Components\FeatureToggle\FeatureFlag;
-use App\Http\Response\JsonDataResponse;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\RequestHandlerInterface;
 use stdClass;
+use ZayMedia\Shared\Components\FeatureToggle\FeatureFlag;
+use ZayMedia\Shared\Http\Response\JsonDataResponse;
 
 final class HomeAction implements RequestHandlerInterface
 {

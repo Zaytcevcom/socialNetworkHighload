@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-use App\Components\FeatureToggle\FeatureFlag;
-use App\Components\FeatureToggle\Features;
-use App\Components\FeatureToggle\FeaturesContext;
-use App\Components\FeatureToggle\FeatureSwitch;
 use Psr\Container\ContainerInterface;
+use ZayMedia\Shared\Components\FeatureToggle\FeatureFlag;
+use ZayMedia\Shared\Components\FeatureToggle\Features;
+use ZayMedia\Shared\Components\FeatureToggle\FeaturesContext;
+use ZayMedia\Shared\Components\FeatureToggle\FeatureSwitch;
 
 return [
     FeatureFlag::class => DI\get(Features::class),

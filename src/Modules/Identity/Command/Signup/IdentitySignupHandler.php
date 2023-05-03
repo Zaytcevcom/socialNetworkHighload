@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Modules\Identity\Command\Signup;
 
-use App\Components\Flusher;
-use App\Http\Exception\DomainExceptionModule;
 use App\Modules\Identity\Entity\User\User;
 use App\Modules\Identity\Entity\User\UserRepository;
 use App\Modules\Identity\Service\PasswordHasher;
 use DateTimeImmutable;
+use ZayMedia\Shared\Components\Flusher;
+use ZayMedia\Shared\Http\Exception\DomainExceptionModule;
 
 final class IdentitySignupHandler
 {

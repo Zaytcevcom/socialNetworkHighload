@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Modules\Post\Query\GetById;
 
-use App\Http\Exception\DomainExceptionModule;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
+use ZayMedia\Shared\Http\Exception\DomainExceptionModule;
 
 final class PostGetByIdFetcher
 {

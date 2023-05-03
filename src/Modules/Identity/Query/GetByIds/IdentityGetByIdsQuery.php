@@ -10,7 +10,7 @@ final class IdentityGetByIdsQuery
 {
     public function __construct(
         #[Assert\NotBlank]
-        public readonly string|array $ids = '',
+        public readonly array $ids,
     ) {
     }
 }

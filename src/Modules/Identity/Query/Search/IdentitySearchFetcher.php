@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace App\Modules\Identity\Query\Search;
 
-use App\Components\Data\AllCount;
-use App\Modules\ResultCountItems;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Exception;
+use ZayMedia\Shared\Helpers\CursorPagination\CursorPagination;
+use ZayMedia\Shared\Helpers\CursorPagination\CursorPaginationResult;
 
 final class IdentitySearchFetcher
 {
@@ -16,10 +15,7 @@ final class IdentitySearchFetcher
     ) {
     }
 
-    /**
-     * @throws Exception
-     */
-    public function fetch(IdentitySearchQuery $query): ResultCountItems
+    public function fetch(IdentitySearchQuery $query): CursorPaginationResult
     {
         $sqlQuery = $this->connection->createQueryBuilder()
             ->select(['*'])
@@ -31,14 +27,15 @@ final class IdentitySearchFetcher
                 ->setParameter('search', $query->search . '%');
         }
 
-        $result = $sqlQuery
-            ->orderBy('id', 'DESC')
-            ->setMaxResults($query->count)
-            ->setFirstResult($query->offset)
-            ->executeQuery();
-
-        $rows = $result->fetchAllAssociative();
-
-        return new ResultCountItems(AllCount::get($sqlQuery), $rows);
+        return CursorPagination::generateResult(
+            query: $sqlQuery,
+            cursor: $query->cursor,
+            count: $query->count,
+            isSortDescending: true,
+            orderingBy: [
+                'id' => 'DESC',
+            ],
+            field: 'id',
+        );
     }
 }

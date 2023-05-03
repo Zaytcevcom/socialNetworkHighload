@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace App\Modules\Friends\Command\Add;
 
-use App\Components\Flusher;
-use App\Components\Queue\Queue;
-use App\Http\Exception\DomainExceptionModule;
 use App\Modules\Friends\Entity\Friendship\Friendship;
 use App\Modules\Friends\Entity\Friendship\FriendshipRepository;
 use App\Modules\Friends\Entity\FriendshipRequest\FriendshipRequest;
@@ -19,6 +16,9 @@ use App\Modules\Identity\Entity\User\UserRepository;
 use App\Modules\Post\Helpers\PostHelper;
 use App\Modules\Post\Helpers\PostQueue;
 use Doctrine\DBAL\Exception;
+use ZayMedia\Shared\Components\Flusher;
+use ZayMedia\Shared\Components\Queue\Queue;
+use ZayMedia\Shared\Http\Exception\DomainExceptionModule;
 
 final class FriendshipAddHandler
 {
@@ -109,7 +109,7 @@ final class FriendshipAddHandler
 
     private function sendToQueueRefreshFeedByUser(int $userId): void
     {
-        $this->queue->send(
+        $this->queue->publish(
             queue: PostHelper::getQueueName(PostQueue::REFRESH_FEED_BY_USER),
             message: ['userId' => $userId]
         );

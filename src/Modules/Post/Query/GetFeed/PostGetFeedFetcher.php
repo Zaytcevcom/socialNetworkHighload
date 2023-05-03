@@ -8,6 +8,8 @@ use App\Modules\Friends\Query\GetUserFriendIds\GetUserFriendIdsFetcher;
 use App\Modules\Friends\Query\GetUserFriendIds\GetUserFriendIdsQuery;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
+use ZayMedia\Shared\Helpers\CursorPagination\CursorPagination;
+use ZayMedia\Shared\Helpers\CursorPagination\CursorPaginationResult;
 
 final class PostGetFeedFetcher
 {
@@ -18,7 +20,7 @@ final class PostGetFeedFetcher
     }
 
     /** @throws Exception */
-    public function fetch(PostGetFeedQuery $query): array
+    public function fetch(PostGetFeedQuery $query): CursorPaginationResult
     {
         $queryBuilder = $this->connection->createQueryBuilder();
 
@@ -30,13 +32,16 @@ final class PostGetFeedFetcher
                 $queryBuilder->expr()->in('user_id', $this->getFriendIds($query->userId))
             );
 
-        $result = $sqlQuery
-            ->addOrderBy('p.id', 'DESC')
-            ->setMaxResults($query->count)
-            ->setFirstResult($query->offset)
-            ->executeQuery();
-
-        return $result->fetchAllAssociative();
+        return CursorPagination::generateResult(
+            query: $sqlQuery,
+            cursor: $query->cursor,
+            count: $query->count,
+            isSortDescending: true,
+            orderingBy: [
+                'p.id' => 'DESC',
+            ],
+            field: 'p.id',
+        );
     }
 
     /**

@@ -14,7 +14,6 @@ return [
 
         $configuration = new Doctrine\Migrations\Configuration\Configuration();
         $configuration->addMigrationsDirectory('App\Components\Data\Migration', __DIR__ . '/../../src/Components/Data/Migration');
-        // $configuration->setAllOrNothing(true);
         $configuration->setCheckDatabasePlatform(false);
 
         $storageConfiguration = new Migrations\Metadata\Storage\TableMetadataStorageConfiguration();

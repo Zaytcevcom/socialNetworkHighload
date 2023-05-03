@@ -4,16 +4,18 @@ declare(strict_types=1);
 
 namespace App\Http\Action\V1\Posts;
 
-use App\Components\Router\Route;
-use App\Components\Validator\Validator;
-use App\Http\Middleware\Identity\Authenticate;
-use App\Http\Response\JsonDataSuccessResponse;
 use App\Modules\Post\Command\Delete\PostDeleteCommand;
 use App\Modules\Post\Command\Delete\PostDeleteHandler;
 use OpenApi\Attributes as OA;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use ZayMedia\Shared\Components\Router\Route;
+use ZayMedia\Shared\Components\Validator\Validator;
+use ZayMedia\Shared\Helpers\OpenApi\ResponseSuccessful;
+use ZayMedia\Shared\Helpers\OpenApi\Security;
+use ZayMedia\Shared\Http\Middleware\Identity\Authenticate;
+use ZayMedia\Shared\Http\Response\JsonDataSuccessResponse;
 
 #[OA\Delete(
     path: '/posts/{id}',
@@ -21,8 +23,9 @@ use Psr\Http\Server\RequestHandlerInterface;
     **Коды ошибок**:<br><br>
     **1** - Доступ запрещен<br>',
     summary: 'Удаляет пост',
-    security: [['bearerAuth' => '{}']],
-    tags: ['Posts']
+    security: [Security::BEARER_AUTH],
+    tags: ['Posts'],
+    responses: [new ResponseSuccessful()]
 )]
 #[OA\Parameter(
     name: 'id',
@@ -34,10 +37,6 @@ use Psr\Http\Server\RequestHandlerInterface;
         format: 'int64'
     ),
     example: 1
-)]
-#[OA\Response(
-    response: '200',
-    description: 'Successful operation'
 )]
 final class DeleteAction implements RequestHandlerInterface
 {

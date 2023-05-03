@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace App\Modules\Post\Query\Cached\CachedGetFeed;
 
-use App\Components\Cacher\Cacher;
-use App\Components\Queue\Queue;
 use App\Modules\Post\Helpers\PostHelper;
 use App\Modules\Post\Helpers\PostQueue;
 use App\Modules\Post\Query\Cached\CachedGetByIds\PostCachedGetByIdsFetcher;
 use App\Modules\Post\Query\Cached\CachedGetByIds\PostCachedGetByIdsQuery;
-use App\Modules\ResultCursorItems;
+use ZayMedia\Shared\Components\Cacher\Cacher;
+use ZayMedia\Shared\Components\Queue\Queue;
+use ZayMedia\Shared\Helpers\CursorPagination\CursorPagination;
+use ZayMedia\Shared\Helpers\CursorPagination\CursorPaginationResult;
 
 final class PostCachedGetFeedFetcher
 {
@@ -21,31 +22,44 @@ final class PostCachedGetFeedFetcher
     ) {
     }
 
-    public function fetch(PostCachedGetFeedQuery $query): ResultCursorItems
+    public function fetch(PostCachedGetFeedQuery $query): CursorPaginationResult
     {
+        $cursorScore = CursorPagination::decodeScore($query->cursor);
+
+        $start = (null === $cursorScore) ? time() : $cursorScore->start;
+        $offset = (null === $cursorScore) ? 0 : $cursorScore->offset;
+
         $postIds = $this->cacher->zRevRangeByScore(
             key: PostHelper::getCacheKeyFeed($query->userId),
-            start: $query->startedAt,
+            start: $start,
             end: 0,
-            offset: $query->offset,
+            offset: $offset,
             count: $query->count
         );
 
         if (\count($postIds) === 0) {
             $this->sendToQueueRefreshFeedByUser($query->userId);
-            return new ResultCursorItems([], '');
+            return CursorPagination::generateEmptyResult();
         }
 
-        return $this->postCachedGetByIdsFetcher->fetch(
+        $items = $this->postCachedGetByIdsFetcher->fetch(
             new PostCachedGetByIdsQuery(
                 ids: $postIds
             )
+        );
+
+        $offset += \count($items);
+
+        return new CursorPaginationResult(
+            count: 0, // todo
+            items: $items,
+            cursor: CursorPagination::encodeScore($start, $offset)
         );
     }
 
     private function sendToQueueRefreshFeedByUser(int $userId): void
     {
-        $this->queue->send(
+        $this->queue->publish(
             queue: PostHelper::getQueueName(PostQueue::REFRESH_FEED_BY_USER),
             message: ['userId' => $userId]
         );

@@ -4,17 +4,19 @@ declare(strict_types=1);
 
 namespace App\Http\Action\V1\Posts;
 
-use App\Components\Serializer\Denormalizer;
-use App\Components\Validator\Validator;
 use App\Http\Action\Unifier\Post\PostUnifier;
-use App\Http\Middleware\Identity\Authenticate;
-use App\Http\Response\JsonDataResponse;
 use App\Modules\Post\Command\Create\PostCreateCommand;
 use App\Modules\Post\Command\Create\PostCreateHandler;
 use OpenApi\Attributes as OA;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use ZayMedia\Shared\Components\Serializer\Denormalizer;
+use ZayMedia\Shared\Components\Validator\Validator;
+use ZayMedia\Shared\Helpers\OpenApi\ResponseSuccessful;
+use ZayMedia\Shared\Helpers\OpenApi\Security;
+use ZayMedia\Shared\Http\Middleware\Identity\Authenticate;
+use ZayMedia\Shared\Http\Response\JsonDataResponse;
 
 #[OA\Post(
     path: '/posts',
@@ -22,7 +24,7 @@ use Psr\Http\Server\RequestHandlerInterface;
     **Коды ошибок**:<br>
     **1** - Доступ запрещен<br>',
     summary: 'Создание поста',
-    security: [['bearerAuth' => '{}']],
+    security: [Security::BEARER_AUTH],
     requestBody: new OA\RequestBody(
         required: true,
         content: new OA\JsonContent(
@@ -35,11 +37,8 @@ use Psr\Http\Server\RequestHandlerInterface;
             ]
         )
     ),
-    tags: ['Posts']
-)]
-#[OA\Response(
-    response: '200',
-    description: 'Successful operation'
+    tags: ['Posts'],
+    responses: [new ResponseSuccessful()]
 )]
 final class CreateAction implements RequestHandlerInterface
 {

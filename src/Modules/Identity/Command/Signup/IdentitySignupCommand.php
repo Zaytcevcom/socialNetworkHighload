@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Modules\Identity\Command\Signup;
 
-use App\Components\Validator\Regex;
 use Symfony\Component\Validator\Constraints as Assert;
+use ZayMedia\Shared\Components\Validator\Regex;
 
 final class IdentitySignupCommand
 {
@@ -14,7 +14,7 @@ final class IdentitySignupCommand
         public readonly string $username,
         #[Assert\Regex(pattern: Regex::FIRST_NAME)]
         public readonly string $firstName,
-        #[Assert\Regex(pattern: Regex::SECOND_NAME)]
+        #[Assert\Regex(pattern: Regex::LAST_NAME)]
         public readonly string $secondName,
         public readonly ?int $sex,
         #[Assert\NotBlank]

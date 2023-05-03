@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 
-use App\Components\JWTParser;
-use App\Http\Middleware\Identity\BearerTokenValidator;
 use App\Modules\OAuth\Entity\AccessTokenRepository;
 use App\Modules\OAuth\Entity\AuthCode;
 use App\Modules\OAuth\Entity\AuthCodeRepository;
@@ -31,6 +29,8 @@ use League\OAuth2\Server\Repositories\ScopeRepositoryInterface;
 use League\OAuth2\Server\Repositories\UserRepositoryInterface;
 use League\OAuth2\Server\ResourceServer;
 use Psr\Container\ContainerInterface;
+use ZayMedia\Shared\Components\JWTParser;
+use ZayMedia\Shared\Http\Middleware\Identity\BearerTokenValidator;
 
 use function App\Components\env;
 

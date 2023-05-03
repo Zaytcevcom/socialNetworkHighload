@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-use App\Components\FeatureToggle\FeaturesMiddleware;
-use App\Http\Middleware;
 use Middlewares\ContentLanguage;
 use Slim\App;
 use Slim\Middleware\ErrorMiddleware;
+use ZayMedia\Shared\Components\FeatureToggle\FeaturesMiddleware;
+use ZayMedia\Shared\Http\Middleware;
 
 return static function (App $app): void {
     $app->add(Middleware\Identity\Authenticate::class);

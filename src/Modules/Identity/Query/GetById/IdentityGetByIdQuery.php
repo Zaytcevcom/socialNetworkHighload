@@ -11,7 +11,7 @@ final class IdentityGetByIdQuery
     public function __construct(
         #[Assert\NotBlank]
         public readonly ?int $id = null,
-        public readonly string|array $fields = '',
+        public readonly array $fields = [],
     ) {
     }
 }

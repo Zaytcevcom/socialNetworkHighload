@@ -4,25 +4,28 @@ declare(strict_types=1);
 
 namespace App\Http\Action\V1\Users;
 
-use App\Components\Router\Route;
-use App\Components\Serializer\Denormalizer;
-use App\Components\Validator\Validator;
 use App\Http\Action\Unifier\User\UserUnifier;
-use App\Http\Middleware\Identity\Authenticate;
-use App\Http\Response\JsonDataResponse;
 use App\Modules\Identity\Query\GetById\IdentityGetByIdFetcher;
 use App\Modules\Identity\Query\GetById\IdentityGetByIdQuery;
 use OpenApi\Attributes as OA;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use ZayMedia\Shared\Components\Router\Route;
+use ZayMedia\Shared\Components\Serializer\Denormalizer;
+use ZayMedia\Shared\Components\Validator\Validator;
+use ZayMedia\Shared\Helpers\OpenApi\ResponseSuccessful;
+use ZayMedia\Shared\Helpers\OpenApi\Security;
+use ZayMedia\Shared\Http\Middleware\Identity\Authenticate;
+use ZayMedia\Shared\Http\Response\JsonDataResponse;
 
 #[OA\Get(
     path: '/users/{id}',
     description: 'Получение информации о пользователе по его идентификатору',
     summary: 'Получение информации о пользователе по его идентификатору',
-    security: [['bearerAuth' => '{}']],
-    tags: ['Users']
+    security: [Security::BEARER_AUTH],
+    tags: ['Users'],
+    responses: [new ResponseSuccessful()]
 )]
 #[OA\Parameter(
     name: 'id',
@@ -33,10 +36,6 @@ use Psr\Http\Server\RequestHandlerInterface;
         type: 'integer'
     ),
     example: 1
-)]
-#[OA\Response(
-    response: '200',
-    description: 'Successful operation'
 )]
 final class GetByIdAction implements RequestHandlerInterface
 {

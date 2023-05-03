@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use App\Components\Cacher\Cacher;
-use App\Components\Cacher\RedisCacher;
 use Psr\Container\ContainerInterface;
+use ZayMedia\Shared\Components\Cacher\Cacher;
+use ZayMedia\Shared\Components\Cacher\RedisCacher;
 
 use function App\Components\env;
 

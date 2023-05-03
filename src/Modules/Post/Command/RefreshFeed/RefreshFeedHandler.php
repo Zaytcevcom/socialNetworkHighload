@@ -4,33 +4,39 @@ declare(strict_types=1);
 
 namespace App\Modules\Post\Command\RefreshFeed;
 
-use App\Components\Cacher\Cacher;
 use App\Modules\Post\Helpers\PostHelper;
+use App\Modules\Post\Helpers\PostQueue;
 use App\Modules\Post\Query\GetFeed\PostGetFeedFetcher;
 use App\Modules\Post\Query\GetFeed\PostGetFeedQuery;
 use Doctrine\DBAL\Exception;
+use ZayMedia\Shared\Components\Cacher\Cacher;
+use ZayMedia\Shared\Components\Queue\Queue;
+use ZayMedia\Shared\Helpers\Helper;
 
 final class RefreshFeedHandler
 {
     public function __construct(
         private readonly PostGetFeedFetcher $postGetFeedFetcher,
         private readonly Cacher $cacher,
+        private readonly Queue $queue,
     ) {
     }
 
     /** @throws Exception */
     public function handle(RefreshFeedCommand $command): void
     {
-        /** @var array{array{id:int, created_at: int}} $posts */
-        $posts = $this->postGetFeedFetcher->fetch(
+        $oldPostIds = $this->getOldPostIds($command->userId);
+        $newPosts = [];
+
+        $result = $this->postGetFeedFetcher->fetch(
             new PostGetFeedQuery(
                 userId: $command->userId,
                 count: 1000,
-                offset: 0
             )
         );
 
-        foreach ($posts as $post) {
+        /** @var array{id:int, created_at: int} $post */
+        foreach ($result->items as $post) {
             $key = PostHelper::getCacheKeyPost($post['id']);
 
             if (!$this->cacher->get($key)) {
@@ -46,11 +52,41 @@ final class RefreshFeedHandler
                 score: $post['created_at'],
                 value: $post['id']
             );
+
+            if (!\in_array($post['id'], $oldPostIds, true)) {
+                $newPosts[] = $post;
+            }
         }
 
         $this->cacher->expire(
             key: PostHelper::getCacheKeyFeed($command->userId),
             ttl: PostHelper::getCacheTTLFeed()
         );
+
+        $this->sendToRealtime($command->userId, $newPosts);
+    }
+
+    private function getOldPostIds(int $userId): array
+    {
+        return Helper::toArrayInt(
+            $this->cacher->zRevRangeByScore(
+                key: PostHelper::getCacheKeyFeed($userId),
+                start: time(),
+                end: 0,
+                offset: 0,
+                count: 1000
+            )
+        );
+    }
+
+    /** @param array<int, array> $posts */
+    private function sendToRealtime(int $userId, array $posts): void
+    {
+        foreach ($posts as $post) {
+            $this->queue->publish(
+                queue: PostHelper::getQueueName(PostQueue::UPDATE_FEED_PREFIX) . $userId,
+                message: $post
+            );
+        }
     }
 }

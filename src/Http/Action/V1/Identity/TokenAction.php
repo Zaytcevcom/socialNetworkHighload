@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Http\Action\V1\Identity;
 
-use App\Http\Exception\DomainExceptionModule;
-use App\Http\Response\JsonDataResponse;
 use Exception;
 use League\OAuth2\Server\AuthorizationServer;
 use OpenApi\Attributes as OA;
@@ -13,6 +11,9 @@ use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use ZayMedia\Shared\Helpers\OpenApi\ResponseSuccessful;
+use ZayMedia\Shared\Http\Exception\DomainExceptionModule;
+use ZayMedia\Shared\Http\Response\JsonDataResponse;
 
 #[OA\Post(
     path: '/identity/token',
@@ -48,11 +49,8 @@ use Psr\Http\Server\RequestHandlerInterface;
             ]
         )
     ),
-    tags: ['Identity']
-)]
-#[OA\Response(
-    response: '200',
-    description: 'Successful operation'
+    tags: ['Identity'],
+    responses: [new ResponseSuccessful()]
 )]
 final class TokenAction implements RequestHandlerInterface
 {

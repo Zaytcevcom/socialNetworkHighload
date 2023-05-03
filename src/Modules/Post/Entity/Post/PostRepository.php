@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Modules\Post\Entity\Post;
 
-use App\Http\Exception\DomainExceptionModule;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
+use ZayMedia\Shared\Http\Exception\DomainExceptionModule;
 
 class PostRepository
 {

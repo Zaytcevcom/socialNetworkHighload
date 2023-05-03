@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use App\Components\Queue\Queue;
-use App\Components\Queue\RabbitMQ;
 use Psr\Container\ContainerInterface;
+use ZayMedia\Shared\Components\Queue\Queue;
+use ZayMedia\Shared\Components\Queue\RabbitMQ;
 
 use function App\Components\env;
 

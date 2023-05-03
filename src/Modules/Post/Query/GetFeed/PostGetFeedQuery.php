@@ -12,7 +12,7 @@ final class PostGetFeedQuery
         #[Assert\NotBlank]
         public readonly int $userId,
         public readonly int $count = 100,
-        public readonly int $offset = 0,
+        public readonly ?string $cursor = null,
     ) {
     }
 }

@@ -41,7 +41,7 @@ final class PostUnifier implements UnifierInterface
             new IdentityGetByIdsQuery($ids)
         );
 
-        return $this->userSerializer->serializeItems($result->items);
+        return $this->userSerializer->serializeItems($result);
     }
 
     private function mapUsers(array $items, array $users): array

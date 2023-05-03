@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace App\Modules\Post\Query\Cached\CachedGetByIds;
 
-use App\Components\Cacher\Cacher;
 use App\Modules\Post\Helpers\PostHelper;
 use App\Modules\Post\Query\GetByIds\PostGetByIdsFetcher;
 use App\Modules\Post\Query\GetByIds\PostGetByIdsQuery;
-use App\Modules\ResultCursorItems;
+use ZayMedia\Shared\Components\Cacher\Cacher;
 
 final class PostCachedGetByIdsFetcher
 {
@@ -18,7 +17,7 @@ final class PostCachedGetByIdsFetcher
     ) {
     }
 
-    public function fetch(PostCachedGetByIdsQuery $query): ResultCursorItems
+    public function fetch(PostCachedGetByIdsQuery $query): array
     {
         $result = $this->cacher->mGet(
             array_map(
@@ -27,32 +26,29 @@ final class PostCachedGetByIdsFetcher
             )
         );
 
-        /** @var array{array{id: int}} $posts */
-        $posts = array_map(
+        /** @var array{array{id: int}} $items */
+        $items = array_map(
             fn (string $v): array => (array)json_decode($v, true),
             $result
         );
 
-        $notExistsPostIds = $this->getNotExistsPostIds($query->ids, $posts);
+        $notExistsIds = $this->getNotExistsIds($query->ids, $items);
 
-        if (\count($notExistsPostIds) !== 0) {
-            $posts = array_merge($posts, $this->getFromDataBaseAndSaveToCache($notExistsPostIds));
+        if (\count($notExistsIds) !== 0) {
+            $items = array_merge($items, $this->getFromDataBaseAndSaveToCache($notExistsIds));
         }
 
-        return new ResultCursorItems(
-            items: $posts,
-            cursor: ''
-        );
+        return $items;
     }
 
-    /** @param array{array{id: int}} $posts */
-    private function getNotExistsPostIds(array $ids, array $posts): array
+    /** @param array{array{id: int}} $items */
+    private function getNotExistsIds(array $ids, array $items): array
     {
         return array_diff(
             $ids,
             array_map(
-                fn (array $post): int => $post['id'],
-                $posts
+                fn (array $item): int => $item['id'],
+                $items
             )
         );
     }
@@ -66,7 +62,7 @@ final class PostCachedGetByIdsFetcher
         );
 
         /** @var array{id: int} $post */
-        foreach ($result->items as $post) {
+        foreach ($result as $post) {
             $this->cacher->set(
                 key: PostHelper::getCacheKeyPost($post['id']),
                 value: json_encode($post),
@@ -74,6 +70,6 @@ final class PostCachedGetByIdsFetcher
             );
         }
 
-        return $result->items;
+        return $result;
     }
 }

@@ -33,7 +33,7 @@ final class UserFixture extends AbstractFixture
 
         $manager->persist($user);
 
-        for ($i = 0; $i < 100; ++$i) {
+        for ($i = 0; $i < 10000; ++$i) {
             $user = User::signup(
                 username: Factory::create($locale)->userName() . $i,
                 firstName: Factory::create($locale)->firstName,

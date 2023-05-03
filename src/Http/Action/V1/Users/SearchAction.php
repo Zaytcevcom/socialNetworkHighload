@@ -4,24 +4,30 @@ declare(strict_types=1);
 
 namespace App\Http\Action\V1\Users;
 
-use App\Components\Serializer\Denormalizer;
-use App\Components\Validator\Validator;
 use App\Http\Action\Unifier\User\UserUnifier;
-use App\Http\Middleware\Identity\Authenticate;
-use App\Http\Response\JsonDataItemsResponse;
 use App\Modules\Identity\Query\Search\IdentitySearchFetcher;
 use App\Modules\Identity\Query\Search\IdentitySearchQuery;
 use OpenApi\Attributes as OA;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use ZayMedia\Shared\Components\Serializer\Denormalizer;
+use ZayMedia\Shared\Components\Validator\Validator;
+use ZayMedia\Shared\Helpers\OpenApi\ParameterCount;
+use ZayMedia\Shared\Helpers\OpenApi\ParameterCursor;
+use ZayMedia\Shared\Helpers\OpenApi\ResponseSuccessful;
+use ZayMedia\Shared\Helpers\OpenApi\Security;
+use ZayMedia\Shared\Http\Middleware\Identity\Authenticate;
+use ZayMedia\Shared\Http\Response\JsonDataCursorItemsResponse;
 
 #[OA\Get(
     path: '/users/search',
     description: 'Глобальный поиск по пользователям',
     summary: 'Глобальный поиск по пользователям',
-    security: [['bearerAuth' => '{}']],
-    tags: ['Users']
+    security: [Security::BEARER_AUTH],
+    tags: ['Users'],
+    parameters: [new ParameterCursor(), new ParameterCount()],
+    responses: [new ResponseSuccessful()]
 )]
 #[OA\Parameter(
     name: 'search',
@@ -31,32 +37,6 @@ use Psr\Http\Server\RequestHandlerInterface;
     schema: new OA\Schema(
         type: 'string'
     ),
-)]
-#[OA\Parameter(
-    name: 'count',
-    description: 'Кол-во которое необходимо получить',
-    in: 'query',
-    required: false,
-    schema: new OA\Schema(
-        type: 'integer',
-        format: 'int64'
-    ),
-    example: 100
-)]
-#[OA\Parameter(
-    name: 'offset',
-    description: 'Смещение',
-    in: 'query',
-    required: false,
-    schema: new OA\Schema(
-        type: 'integer',
-        format: 'int64'
-    ),
-    example: 0
-)]
-#[OA\Response(
-    response: '200',
-    description: 'Successful operation'
 )]
 final class SearchAction implements RequestHandlerInterface
 {
@@ -78,9 +58,10 @@ final class SearchAction implements RequestHandlerInterface
 
         $result = $this->fetcher->fetch($query);
 
-        return new JsonDataItemsResponse(
+        return new JsonDataCursorItemsResponse(
             count: $result->count,
-            items: $this->unifier->unify($identity?->id, $result->items)
+            items: $this->unifier->unify($identity?->id, $result->items),
+            cursor: $result->cursor
         );
     }
 }

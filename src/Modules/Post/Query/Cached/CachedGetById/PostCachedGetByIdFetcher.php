@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Modules\Post\Query\Cached\CachedGetById;
 
-use App\Components\Cacher\Cacher;
 use App\Modules\Post\Helpers\PostHelper;
 use App\Modules\Post\Query\GetById\PostGetByIdFetcher;
 use App\Modules\Post\Query\GetById\PostGetByIdQuery;
 use Doctrine\DBAL\Exception;
+use ZayMedia\Shared\Components\Cacher\Cacher;
 
 final class PostCachedGetByIdFetcher
 {
