@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Http\Action\V1\Posts;
 
 use App\Http\Action\Unifier\Post\PostUnifier;
-use App\Modules\Post\Query\Cached\CachedGetFeed\PostCachedGetFeedFetcher;
-use App\Modules\Post\Query\Cached\CachedGetFeed\PostCachedGetFeedQuery;
+use App\Modules\Post\Query\GetFeed\Cached\PostGetFeedCachedFetcher;
+use App\Modules\Post\Query\GetFeed\Cached\PostGetFeedCachedQuery;
 use OpenApi\Attributes as OA;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -33,7 +33,7 @@ final class GetFeedAction implements RequestHandlerInterface
 {
     public function __construct(
         private readonly Denormalizer $denormalizer,
-        private readonly PostCachedGetFeedFetcher $fetcher,
+        private readonly PostGetFeedCachedFetcher $fetcher,
         private readonly Validator $validator,
         private readonly PostUnifier $unifier
     ) {
@@ -48,7 +48,7 @@ final class GetFeedAction implements RequestHandlerInterface
                 $request->getQueryParams(),
                 ['userId' => $identity->id]
             ),
-            PostCachedGetFeedQuery::class
+            PostGetFeedCachedQuery::class
         );
 
         $this->validator->validate($query);

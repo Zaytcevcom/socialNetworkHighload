@@ -32,6 +32,11 @@ services:
             DB_PASSWORD: ${DB_PASSWORD}
             DB_NAME: ${DB_NAME}
             DB_CHARSET: ${DB_CHARSET}
+            DB_REPLICA_HOST_1: ${DB_REPLICA_HOST_1}
+            DB_REPLICA_HOST_2: ${DB_REPLICA_HOST_2}
+            DB_REPLICA_USER: ${DB_REPLICA_USER}
+            DB_REPLICA_PASSWORD: ${DB_REPLICA_PASSWORD}
+            DB_REPLICA_NAME: ${DB_REPLICA_NAME}
             JWT_ENCRYPTION_KEY: /run/secrets/jwt_encryption_key
             JWT_PUBLIC_KEY_PATH: /run/secrets/jwt_public_key
             JWT_PRIVATE_KEY_PATH: /run/secrets/jwt_private_key
@@ -59,21 +64,59 @@ services:
             DB_PASSWORD: ${DB_PASSWORD}
             DB_NAME: ${DB_NAME}
             DB_CHARSET: ${DB_CHARSET}
+            DB_REPLICA_HOST_1: ${DB_REPLICA_HOST_1}
+            DB_REPLICA_HOST_2: ${DB_REPLICA_HOST_2}
+            DB_REPLICA_USER: ${DB_REPLICA_USER}
+            DB_REPLICA_PASSWORD: ${DB_REPLICA_PASSWORD}
+            DB_REPLICA_NAME: ${DB_REPLICA_NAME}
         volumes:
             - .:/app
         networks:
             - hl-network
 
-    db:
-        container_name: hl-mysql
-        image: mysql
-        ports:
-            - "8887:3306"
+    db-source:
+        container_name: hl-mysql-source
+        restart: always
+        build:
+            context: docker
+            dockerfile: development/mysql/semi-sync/source/Dockerfile
         environment:
             MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
             MYSQL_DATABASE: ${DB_NAME}
         volumes:
-            - ./var/mysql:/var/lib/mysql
+            - ./var/mysql/async/source:/var/lib/mysql
+        networks:
+            - hl-network
+
+    db-replica-1:
+        container_name: hl-mysql-replica-1
+        restart: always
+        build:
+            context: docker
+            dockerfile: development/mysql/semi-sync/replica-1/Dockerfile
+        environment:
+            MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+            MYSQL_DATABASE: ${DB_NAME}
+        volumes:
+            - ./var/mysql/semi-sync/replica-1:/var/lib/mysql
+        depends_on:
+            - db-source
+        networks:
+            - hl-network
+
+    db-replica-2:
+        container_name: hl-mysql-replica-2
+        restart: always
+        build:
+            context: docker
+            dockerfile: development/mysql/semi-sync/replica-2/Dockerfile
+        environment:
+            MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+            MYSQL_DATABASE: ${DB_NAME}
+        volumes:
+            - ./var/mysql/semi-sync/replica-2:/var/lib/mysql
+        depends_on:
+            - db-source
         networks:
             - hl-network
 
@@ -152,7 +195,7 @@ services:
         networks:
             - hl-network
         depends_on:
-            - db
+            - db-source
             - redis
             - rabbitmq
         command: composer app posts:consumer-refresh-feed-by-user
@@ -178,7 +221,7 @@ services:
         networks:
             - hl-network
         depends_on:
-            - db
+            - db-source
             - redis
             - rabbitmq
         command: composer app posts:consumer-refresh-feed-by-post

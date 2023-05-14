@@ -12,6 +12,8 @@ use Doctrine\ORM\ORMSetup;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
+use ZayMedia\Shared\Components\ReplicaEntityManager\ReplicaEntityManager;
+use ZayMedia\Shared\Components\ReplicaEntityManager\ReplicaEntityManagerInterface;
 
 use function App\Components\env;
 
@@ -26,7 +28,7 @@ return [
          *     'cache_dir':?string,
          *     types:array<string,class-string<\Doctrine\DBAL\Types\Type>>,
          *     subscribers:string[],
-         *     connection:array<string, mixed>
+         *     connections:array{source:array<string, mixed>, replicas: array{array<string, mixed>}}
          * } $settings
          */
         $settings = $container->get('config')['doctrine'];
@@ -48,7 +50,7 @@ return [
 
         /** @psalm-suppress ArgumentTypeCoercion */
         $connection = DriverManager::getConnection(
-            $settings['connection'],
+            $settings['connections']['source'],
             $config
         );
 
@@ -60,19 +62,80 @@ return [
         return $em->getConnection();
     },
 
+    ReplicaEntityManagerInterface::class => static function (ContainerInterface $container): ReplicaEntityManager {
+        /**
+         * @psalm-suppress MixedArrayAccess
+         * @var array{
+         *     metadata_dirs:string[],
+         *     dev_mode:bool,
+         *     proxy_dir:string,
+         *     'cache_dir':?string,
+         *     types:array<string,class-string<\Doctrine\DBAL\Types\Type>>,
+         *     subscribers:string[],
+         *     connections:array{source:array<string, mixed>, replicas: array{array<string, mixed>}}
+         * } $settings
+         */
+        $settings = $container->get('config')['doctrine'];
+
+        $config = ORMSetup::createAttributeMetadataConfiguration(
+            $settings['metadata_dirs'],
+            $settings['dev_mode'],
+            $settings['proxy_dir'],
+            $settings['cache_dir'] ? new FilesystemAdapter('', 0, $settings['cache_dir']) : new ArrayAdapter()
+        );
+
+        $config->setNamingStrategy(new UnderscoreNamingStrategy());
+
+        foreach ($settings['types'] as $name => $class) {
+            if (!Type::hasType($name)) {
+                Type::addType($name, $class);
+            }
+        }
+
+        $slaveId = rand(0, count($settings['connections']['replicas']) - 1);
+
+        /** @psalm-suppress ArgumentTypeCoercion */
+        $connection = DriverManager::getConnection(
+            $settings['connections']['replicas'][$slaveId],
+            $config
+        );
+
+        return new ReplicaEntityManager($connection, $config);
+    },
+
     'config' => [
         'doctrine' => [
+            'connections' => [
+                'source' => [
+                    'driver' => env('DB_DRIVER'),
+                    'host' => env('DB_HOST'),
+                    'user' => env('DB_USER'),
+                    'password' => env('DB_PASSWORD'),
+                    'dbname' => env('DB_NAME'),
+                    'charset' => env('DB_CHARSET'),
+                ],
+                'replicas' => [
+                    [
+                        'driver' => env('DB_DRIVER'),
+                        'host' => env('DB_REPLICA_HOST_1'),
+                        'user' => env('DB_REPLICA_USER'),
+                        'password' => env('DB_REPLICA_PASSWORD'),
+                        'dbname' => env('DB_REPLICA_NAME'),
+                        'charset' => env('DB_CHARSET'),
+                    ],
+                    [
+                        'driver' => env('DB_DRIVER'),
+                        'host' => env('DB_REPLICA_HOST_2'),
+                        'user' => env('DB_REPLICA_USER'),
+                        'password' => env('DB_REPLICA_PASSWORD'),
+                        'dbname' => env('DB_REPLICA_NAME'),
+                        'charset' => env('DB_CHARSET'),
+                    ],
+                ],
+            ],
             'dev_mode' => env('APP_ENV') !== 'dev',
             'cache_dir' => __DIR__ . '/../../var/cache/doctrine/cache',
             'proxy_dir' => __DIR__ . '/../../var/cache/doctrine/proxy',
-            'connection' => [
-                'driver' => env('DB_DRIVER'),
-                'host' => env('DB_HOST'),
-                'user' => env('DB_USER'),
-                'password' => env('DB_PASSWORD'),
-                'dbname' => env('DB_NAME'),
-                'charset' => env('DB_CHARSET'),
-            ],
             'metadata_dirs' => [
                 __DIR__ . '/../../src/Modules/OAuth/Entity',
                 __DIR__ . '/../../src/Modules/Identity/Entity',

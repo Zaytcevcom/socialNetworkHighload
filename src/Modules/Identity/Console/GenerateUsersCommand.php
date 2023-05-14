@@ -33,9 +33,11 @@ final class GenerateUsersCommand extends Command
         $locale = 'ru_RU';
         $password = (new PasswordHasher())->hash('1234567890');
 
+        $batch = 1;
+
         for ($i = 0; $i <= 1_000_000; ++$i) {
             $user = User::signup(
-                username: Factory::create($locale)->userName() . $i,
+                username: Factory::create($locale)->userName() . '.' . $i,
                 firstName: Factory::create($locale)->firstName,
                 secondName: Factory::create($locale)->lastName,
                 sex: rand(0, 1),
@@ -47,10 +49,11 @@ final class GenerateUsersCommand extends Command
 
             $this->em->persist($user);
 
-            if ($i % 10000 === 0) {
-                $output->writeln('<info>Generated: ' . $i . '</info>');
+            if ($i % $batch === 0) {
                 $this->em->flush();
                 $this->em->clear();
+
+                $output->writeln('<info>Generated: ' . $i . ' (UserId: ' . $user->getId() . ')</info>');
             }
         }
 

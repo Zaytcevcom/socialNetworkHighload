@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace App\Modules\Post\Query\Cached\CachedGetByIds;
+namespace App\Modules\Post\Query\GetByIds\Cached;
 
 use App\Modules\Post\Helpers\PostHelper;
 use App\Modules\Post\Query\GetByIds\PostGetByIdsFetcher;
 use App\Modules\Post\Query\GetByIds\PostGetByIdsQuery;
 use ZayMedia\Shared\Components\Cacher\Cacher;
 
-final class PostCachedGetByIdsFetcher
+final class PostGetByIdsCachedFetcher
 {
     public function __construct(
         private readonly Cacher $cacher,
@@ -17,7 +17,7 @@ final class PostCachedGetByIdsFetcher
     ) {
     }
 
-    public function fetch(PostCachedGetByIdsQuery $query): array
+    public function fetch(PostGetByIdsCachedQuery $query): array
     {
         $result = $this->cacher->mGet(
             array_map(

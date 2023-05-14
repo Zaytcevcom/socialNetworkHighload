@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Http\Action\V1\Posts;
 
 use App\Http\Action\Unifier\Post\PostUnifier;
-use App\Modules\Post\Query\Cached\CachedGetById\PostCachedGetByIdFetcher;
-use App\Modules\Post\Query\Cached\CachedGetById\PostCachedGetByIdQuery;
+use App\Modules\Post\Query\GetById\Cached\PostGetByIdCachedFetcher;
+use App\Modules\Post\Query\GetById\Cached\PostGetByIdCachedQuery;
 use OpenApi\Attributes as OA;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -40,7 +40,7 @@ use ZayMedia\Shared\Http\Response\JsonDataResponse;
 final class GetByIdAction implements RequestHandlerInterface
 {
     public function __construct(
-        private readonly PostCachedGetByIdFetcher $fetcher,
+        private readonly PostGetByIdCachedFetcher $fetcher,
         private readonly PostUnifier $unifier,
         private readonly Validator $validator,
     ) {
@@ -50,7 +50,7 @@ final class GetByIdAction implements RequestHandlerInterface
     {
         $identity = Authenticate::findIdentity($request);
 
-        $query = new PostCachedGetByIdQuery(
+        $query = new PostGetByIdCachedQuery(
             id: Route::getArgumentToInt($request, 'id')
         );
 

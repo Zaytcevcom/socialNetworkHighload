@@ -51,16 +51,17 @@ docker-build:
 	docker-compose build --pull
 
 app-clear:
-	docker run --rm -v ${PWD}/:/app -w /app alpine sh -c 'rm -rf var/cache/* var/log/* var/test/*'
+	docker run --rm -v ${PWD}/:/app -w /app alpine sh -c 'rm -rf var/cache/* var/log/* var/test/* var/mysql/*'
 
 
 #Composer
 app-init: app-permissions app-composer-install \
-	app-wait-db app-wait-redis app-wait-rabbitmq \
+	app-wait-db-source app-wait-db-replica-1 app-wait-db-replica-2 \
+	app-wait-redis app-wait-rabbitmq \
 	app-db-migrations app-db-fixtures
 
 app-permissions:
-	docker run --rm -v ${PWD}/:/app -w /app alpine chmod 777 var/cache var/log var/test
+	docker run --rm -v ${PWD}/:/app -w /app alpine chmod 777 var/cache var/log var/test var/mysql
 
 app-composer-install:
 	docker-compose run --rm php-cli composer install
@@ -74,8 +75,14 @@ app-composer-autoload: #refresh autoloader
 app-composer-outdated: #get not updated
 	docker-compose run --rm php-cli composer outdated
 
-app-wait-db:
-	docker-compose run --rm php-cli wait-for-it db:3306 -t 30
+app-wait-db-source:
+	docker-compose run --rm php-cli wait-for-it db-source:3306 -t 30
+
+app-wait-db-replica-1:
+	docker-compose run --rm php-cli wait-for-it db-replica-1:3306 -t 30
+
+app-wait-db-replica-2:
+	docker-compose run --rm php-cli wait-for-it db-replica-2:3306 -t 30
 
 app-wait-redis:
 	docker-compose run --rm php-cli wait-for-it hl-redis:6379 -t 30

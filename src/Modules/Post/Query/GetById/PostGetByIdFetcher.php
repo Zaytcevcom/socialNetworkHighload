@@ -4,32 +4,24 @@ declare(strict_types=1);
 
 namespace App\Modules\Post\Query\GetById;
 
-use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Exception;
+use App\Modules\Post\Query\GetByIds\PostGetByIdsFetcher;
+use App\Modules\Post\Query\GetByIds\PostGetByIdsQuery;
 use ZayMedia\Shared\Http\Exception\DomainExceptionModule;
 
 final class PostGetByIdFetcher
 {
     public function __construct(
-        private readonly Connection $connection,
+        private readonly PostGetByIdsFetcher $postGetByIdsFetcher,
     ) {
     }
 
-    /** @throws Exception */
     public function fetch(PostGetByIdQuery $query): array
     {
-        $queryBuilder = $this->connection->createQueryBuilder();
+        $result = $this->postGetByIdsFetcher->fetch(
+            new PostGetByIdsQuery([$query->id])
+        );
 
-        $result = $queryBuilder
-            ->select('p.*')
-            ->from('posts', 'p')
-            ->where('p.id = :id')
-            ->andWhere('p.deleted_at IS NULL')
-            ->setParameter('id', $query->id)
-            ->executeQuery()
-            ->fetchAssociative();
-
-        if ($result === false) {
+        if (empty($result)) {
             throw new DomainExceptionModule(
                 module: 'post',
                 message: 'error.post.post_not_found',
@@ -37,6 +29,6 @@ final class PostGetByIdFetcher
             );
         }
 
-        return $result;
+        return (array)$result[0];
     }
 }

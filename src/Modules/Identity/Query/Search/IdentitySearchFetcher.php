@@ -4,20 +4,20 @@ declare(strict_types=1);
 
 namespace App\Modules\Identity\Query\Search;
 
-use Doctrine\DBAL\Connection;
+use ZayMedia\Shared\Components\ReplicaEntityManager\ReplicaEntityManagerInterface;
 use ZayMedia\Shared\Helpers\CursorPagination\CursorPagination;
 use ZayMedia\Shared\Helpers\CursorPagination\CursorPaginationResult;
 
 final class IdentitySearchFetcher
 {
     public function __construct(
-        private readonly Connection $connection
+        private readonly ReplicaEntityManagerInterface $connection
     ) {
     }
 
     public function fetch(IdentitySearchQuery $query): CursorPaginationResult
     {
-        $sqlQuery = $this->connection->createQueryBuilder()
+        $sqlQuery = $this->connection->getConnection()->createQueryBuilder()
             ->select(['*'])
             ->from('users');
 
