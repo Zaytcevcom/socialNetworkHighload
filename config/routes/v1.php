@@ -31,5 +31,12 @@ return static function (App $app): void {
             $group->post('', Action\V1\Posts\CreateAction::class);
             $group->delete('/{id}', Action\V1\Posts\DeleteAction::class);
         }));
+
+        $group->group('/conversations', new Group(static function (RouteCollectorProxy $group): void {
+            $group->get('', Action\V1\Messenger\Conversations\GetByUserIdAction::class);
+            $group->post('/dialog/{userId}', Action\V1\Messenger\Conversations\CreateAction::class);
+            $group->get('/{id}/messages', Action\V1\Messenger\Messages\GetByConversationIdAction::class);
+            $group->post('/{id}/messages', Action\V1\Messenger\Messages\CreateAction::class);
+        }));
     }));
 };

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Action\Unifier\User;
 
-use App\Http\Action\Unifier\UnifierInterface;
 use App\Modules\Identity\Service\UserSerializer;
+use ZayMedia\Shared\Http\Unifier\UnifierInterface;
 
 final class UserUnifier implements UnifierInterface
 {

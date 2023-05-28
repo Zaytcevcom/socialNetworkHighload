@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Http\Action\Unifier\Post;
 
-use App\Http\Action\Unifier\UnifierInterface;
 use App\Modules\Identity\Query\GetByIds\IdentityGetByIdsFetcher;
 use App\Modules\Identity\Query\GetByIds\IdentityGetByIdsQuery;
 use App\Modules\Identity\Service\UserSerializer;
 use App\Modules\Post\Service\PostSerializer;
+use ZayMedia\Shared\Http\Unifier\UnifierInterface;
 
 final class PostUnifier implements UnifierInterface
 {

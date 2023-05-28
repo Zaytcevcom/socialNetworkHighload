@@ -42,6 +42,10 @@ use ZayMedia\Shared\Http\Response\JsonResponse;
     name: 'Posts',
     description: 'Посты'
 )]
+#[OA\Tag(
+    name: 'Messenger',
+    description: 'Общение'
+)]
 final class OpenApiAction implements RequestHandlerInterface
 {
     public function handle(Request $request): Response

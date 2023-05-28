@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use App\Console\HelloCommand;
 use App\Modules\OAuth;
 use Doctrine\Migrations;
 use Doctrine\ORM\EntityManagerInterface;
@@ -29,8 +28,6 @@ return [
                 Migrations\Tools\Console\Command\UpToDateCommand::class,
 
                 OAuth\Console\ClearExpiredCommand::class,
-
-                HelloCommand::class,
             ],
         ],
     ],

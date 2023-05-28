@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use App\Console\FixturesLoadCommand;
 use App\Modules\Identity\Console\GenerateUsersCommand;
 use App\Modules\OAuth\Console\E2ETokenCommand;
 use App\Modules\Post\Console\ConsumerRefreshFeedByPostCommand;
@@ -14,6 +13,7 @@ use Doctrine\ORM\Tools\Console\Command\SchemaTool;
 use Doctrine\ORM\Tools\Console\Command\SchemaTool\DropCommand;
 use Doctrine\ORM\Tools\Console\EntityManagerProvider;
 use Psr\Container\ContainerInterface;
+use ZayMedia\Shared\Console\FixturesLoadCommand;
 
 return [
     FixturesLoadCommand::class => static function (ContainerInterface $container) {

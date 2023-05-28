@@ -13,7 +13,7 @@ final class PostFixture extends AbstractFixture
 {
     public function load(ObjectManager $manager): void
     {
-        for ($i = 0; $i < 200_000; ++$i) {
+        for ($i = 0; $i < 2_000; ++$i) {
             $post = Post::create(
                 userId: rand(1, 100),
                 text: Factory::create('ru_RU')->text,

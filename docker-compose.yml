@@ -24,6 +24,7 @@ services:
         environment:
             APP_ENV: ${APP_ENV}
             APP_DEBUG: ${APP_DEBUG}
+            SERVICE_MESSENGER_URL: ${SERVICE_MESSENGER_URL}
             PHP_IDE_CONFIG: serverName=API
             SENTRY_DSN: ${SENTRY_DSN}
             DB_DRIVER: ${DB_DRIVER}
@@ -79,12 +80,12 @@ services:
         restart: always
         build:
             context: docker
-            dockerfile: development/mysql/semi-sync/source/Dockerfile
+            dockerfile: development/replication/semi-sync/source/Dockerfile
         environment:
             MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
             MYSQL_DATABASE: ${DB_NAME}
         volumes:
-            - ./var/mysql/async/source:/var/lib/mysql
+            - ./var/replication/async/source:/var/lib/mysql
         networks:
             - hl-network
 
@@ -93,12 +94,12 @@ services:
         restart: always
         build:
             context: docker
-            dockerfile: development/mysql/semi-sync/replica-1/Dockerfile
+            dockerfile: development/replication/semi-sync/replica-1/Dockerfile
         environment:
             MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
             MYSQL_DATABASE: ${DB_NAME}
         volumes:
-            - ./var/mysql/semi-sync/replica-1:/var/lib/mysql
+            - ./var/replication/semi-sync/replica-1:/var/lib/mysql
         depends_on:
             - db-source
         networks:
@@ -109,12 +110,12 @@ services:
         restart: always
         build:
             context: docker
-            dockerfile: development/mysql/semi-sync/replica-2/Dockerfile
+            dockerfile: development/replication/semi-sync/replica-2/Dockerfile
         environment:
             MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
             MYSQL_DATABASE: ${DB_NAME}
         volumes:
-            - ./var/mysql/semi-sync/replica-2:/var/lib/mysql
+            - ./var/replication/semi-sync/replica-2:/var/lib/mysql
         depends_on:
             - db-source
         networks:
