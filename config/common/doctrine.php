@@ -71,7 +71,7 @@ return [
          *     'cache_dir':?string,
          *     types:array<string,class-string<\Doctrine\DBAL\Types\Type>>,
          *     subscribers:string[],
-         *     connections:array{source:array<string, mixed>, replicas: array{array<string, mixed>}|empty[]}
+         *     connections:array{source:array<string, mixed>, replica: array<string, mixed>}
          * } $settings
          */
         $settings = $container->get('config')['doctrine'];
@@ -91,12 +91,7 @@ return [
             }
         }
 
-        if (count($settings['connections']['replicas'])) {
-            $slaveId = rand(0, count($settings['connections']['replicas']) - 1);
-            $params = $settings['connections']['replicas'][$slaveId];
-        } else {
-            $params = $settings['connections']['source'];
-        }
+        $params = $settings['connections']['replica'];
 
         /** @psalm-suppress ArgumentTypeCoercion */
         $connection = DriverManager::getConnection(
@@ -119,23 +114,13 @@ return [
                     'charset' => env('DB_CHARSET'),
                     'port' => env('DB_PORT'),
                 ],
-                'replicas' => [
-                    //                    [
-                    //                        'driver' => env('DB_DRIVER'),
-                    //                        'host' => env('DB_REPLICA_HOST_1'),
-                    //                        'user' => env('DB_REPLICA_USER'),
-                    //                        'password' => env('DB_REPLICA_PASSWORD'),
-                    //                        'dbname' => env('DB_REPLICA_NAME'),
-                    //                        'charset' => env('DB_CHARSET'),
-                    //                    ],
-                    //                    [
-                    //                        'driver' => env('DB_DRIVER'),
-                    //                        'host' => env('DB_REPLICA_HOST_2'),
-                    //                        'user' => env('DB_REPLICA_USER'),
-                    //                        'password' => env('DB_REPLICA_PASSWORD'),
-                    //                        'dbname' => env('DB_REPLICA_NAME'),
-                    //                        'charset' => env('DB_CHARSET'),
-                    //                    ],
+                'replica' => [
+                    'driver' => env('DB_DRIVER'),
+                    'host' => env('DB_REPLICA_HOST'),
+                    'user' => env('DB_REPLICA_USER'),
+                    'password' => env('DB_REPLICA_PASSWORD'),
+                    'dbname' => env('DB_REPLICA_NAME'),
+                    'charset' => env('DB_CHARSET'),
                 ],
             ],
             'dev_mode' => env('APP_ENV') !== 'dev',

@@ -51,17 +51,18 @@ docker-build:
 	docker-compose build --pull
 
 app-clear:
-	docker run --rm -v ${PWD}/:/app -w /app alpine sh -c 'rm -rf var/cache/* var/log/* var/test/* var/mysql/*'
+	docker run --rm -v ${PWD}/:/app -w /app alpine sh -c 'rm -rf var/cache/* var/log/* var/test/* var/mysql/* var/replication/*'
 
 
 #Composer
 app-init: app-permissions app-composer-install \
-	app-wait-db-source app-wait-db-replica-1 app-wait-db-replica-2 \
+	app-wait-db-source app-wait-db-replica-1 app-wait-db-replica-2 app-wait-haproxy \
 	app-wait-redis app-wait-rabbitmq \
+	setup-semi-sync-replication \
 	app-db-migrations app-db-fixtures
 
 app-permissions:
-	docker run --rm -v ${PWD}/:/app -w /app alpine chmod 777 var/cache var/log var/test var/mysql
+	docker run --rm -v ${PWD}/:/app -w /app alpine chmod 777 var/cache var/log var/test var/mysql var/replication
 
 app-composer-install:
 	docker-compose run --rm php-cli composer install
@@ -77,6 +78,9 @@ app-composer-outdated: #get not updated
 
 app-wait-db-source:
 	docker-compose run --rm php-cli wait-for-it db-source:3306 -t 30
+
+app-wait-haproxy:
+	docker-compose run --rm php-cli wait-for-it haproxy:3306 -t 30
 
 app-wait-db-replica-1:
 	docker-compose run --rm php-cli wait-for-it db-replica-1:3306 -t 30
@@ -136,9 +140,49 @@ app-test-functional:
 app-test-functional-coverage:
 	docker-compose run --rm php-cli composer test-coverage -- --testsuite=functional
 
+
 #Console
 console:
 	docker-compose run --rm php-cli composer app
+
+
+#Setup semi-sync replication
+setup-semi-sync-replication: setup-semi-sync-replication-source setup-semi-sync-replication-replica-1 setup-semi-sync-replication-replica-2
+
+setup-semi-sync-replication-source:
+	docker exec -it -e MYSQL_PWD=1234567890 hl-mysql-source mysql -u root \
+	-e "\
+		INSTALL PLUGIN rpl_semi_sync_source SONAME 'semisync_source.so'; \
+		INSTALL PLUGIN rpl_semi_sync_replica SONAME 'semisync_replica.so'; \
+		SET GLOBAL rpl_semi_sync_source_enabled = 1; \
+		CREATE USER 'replication'@'%' IDENTIFIED BY '1234567890'; \
+		GRANT REPLICATION SLAVE ON *.* TO 'replication'@'%'; \
+		FLUSH PRIVILEGES; \
+		ALTER USER 'replication'@'%' IDENTIFIED WITH mysql_native_password BY '1234567890'; \
+		SHOW MASTER STATUS; \
+	"
+
+setup-semi-sync-replication-replica-1:
+	docker exec -it -e MYSQL_PWD=1234567890 hl-mysql-replica-1 mysql -u root \
+	-e "\
+		INSTALL PLUGIN rpl_semi_sync_source SONAME 'semisync_source.so'; \
+		INSTALL PLUGIN rpl_semi_sync_replica SONAME 'semisync_replica.so'; \
+		SET GLOBAL rpl_semi_sync_replica_enabled = 1; \
+		CHANGE REPLICATION SOURCE TO SOURCE_HOST='hl-mysql-source', SOURCE_USER='replication', SOURCE_PASSWORD='1234567890', SOURCE_AUTO_POSITION=1; \
+		START REPLICA; \
+		SHOW REPLICA STATUS; \
+    "
+
+setup-semi-sync-replication-replica-2:
+	docker exec -it -e MYSQL_PWD=1234567890 hl-mysql-replica-2 mysql -u root \
+	-e "\
+		INSTALL PLUGIN rpl_semi_sync_source SONAME 'semisync_source.so'; \
+		INSTALL PLUGIN rpl_semi_sync_replica SONAME 'semisync_replica.so'; \
+		SET GLOBAL rpl_semi_sync_replica_enabled = 1; \
+		CHANGE REPLICATION SOURCE TO SOURCE_HOST='hl-mysql-source', SOURCE_USER='replication', SOURCE_PASSWORD='1234567890', SOURCE_AUTO_POSITION=1; \
+		START REPLICA; \
+		SHOW REPLICA STATUS; \
+    "
 
 #docker-compose run --rm php-cli composer require monolog/monolog
 #docker-compose run --rm php-cli composer outdated --direct - просмотр мажорных обновлений
