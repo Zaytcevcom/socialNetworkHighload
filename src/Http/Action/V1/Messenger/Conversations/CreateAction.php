@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Http\Action\V1\Messenger\Conversations;
 
-use App\Components\RestServiceClient;
 use OpenApi\Attributes as OA;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use ZayMedia\Shared\Components\RestServiceClient;
 use ZayMedia\Shared\Components\Router\Route;
 use ZayMedia\Shared\Helpers\OpenApi\ResponseSuccessful;
 use ZayMedia\Shared\Helpers\OpenApi\Security;
