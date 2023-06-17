@@ -9,6 +9,7 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Persistence\ObjectManager;
 use Exception;
 
+/** @noinspection PhpUnused */
 final class FriendsFixture extends AbstractFixture
 {
     /** @throws Exception */

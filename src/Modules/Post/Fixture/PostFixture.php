@@ -9,6 +9,7 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Persistence\ObjectManager;
 use Faker\Factory;
 
+/** @noinspection PhpUnused */
 final class PostFixture extends AbstractFixture
 {
     public function load(ObjectManager $manager): void

@@ -10,6 +10,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use ZayMedia\Shared\Helpers\OpenApi\ResponseSuccessful;
+use ZayMedia\Shared\Helpers\OpenApi\Security;
 use ZayMedia\Shared\Http\Middleware\Identity\Authenticate;
 use ZayMedia\Shared\Http\Response\JsonResponse;
 
@@ -19,7 +20,7 @@ use function App\Components\env;
     path: '/conversations',
     description: 'Получение списка бесед пользователя',
     summary: 'Получение списка бесед пользователя',
-    security: [['bearerAuth' => '{}']],
+    security: [Security::BEARER_AUTH],
     tags: ['Messenger'],
     responses: [new ResponseSuccessful()]
 )]

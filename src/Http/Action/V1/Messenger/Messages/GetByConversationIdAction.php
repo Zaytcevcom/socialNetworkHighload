@@ -11,6 +11,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use ZayMedia\Shared\Components\Router\Route;
 use ZayMedia\Shared\Helpers\OpenApi\ResponseSuccessful;
+use ZayMedia\Shared\Helpers\OpenApi\Security;
 use ZayMedia\Shared\Http\Middleware\Identity\Authenticate;
 use ZayMedia\Shared\Http\Response\JsonResponse;
 
@@ -20,7 +21,7 @@ use function App\Components\env;
     path: '/conversations/{id}/messages',
     description: 'Получение списка сообщений беседы',
     summary: 'Получение списка сообщений беседы',
-    security: [['bearerAuth' => '{}']],
+    security: [Security::BEARER_AUTH],
     tags: ['Messenger'],
     responses: [new ResponseSuccessful()]
 )]

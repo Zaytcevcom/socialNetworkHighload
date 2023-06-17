@@ -27,7 +27,6 @@ services:
             APP_ENV: ${APP_ENV}
             APP_DEBUG: ${APP_DEBUG}
             SERVICE_MESSENGER_URL: ${SERVICE_MESSENGER_URL}
-            PHP_IDE_CONFIG: serverName=API
             SENTRY_DSN: ${SENTRY_DSN}
             DB_DRIVER: ${DB_DRIVER}
             DB_HOST: ${DB_HOST}
@@ -60,7 +59,6 @@ services:
             APP_ENV: ${APP_ENV}
             APP_DEBUG: ${APP_DEBUG}
             SERVICE_MESSENGER_URL: ${SERVICE_MESSENGER_URL}
-            PHP_IDE_CONFIG: serverName=API
             SENTRY_DSN: ${SENTRY_DSN}
             DB_DRIVER: ${DB_DRIVER}
             DB_HOST: ${DB_HOST}
@@ -93,7 +91,6 @@ services:
             APP_ENV: ${APP_ENV}
             APP_DEBUG: ${APP_DEBUG}
             SERVICE_MESSENGER_URL: ${SERVICE_MESSENGER_URL}
-            PHP_IDE_CONFIG: serverName=API
             SENTRY_DSN: ${SENTRY_DSN}
             DB_DRIVER: ${DB_DRIVER}
             DB_HOST: ${DB_HOST}

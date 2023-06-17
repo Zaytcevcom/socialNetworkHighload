@@ -10,6 +10,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use ZayMedia\Shared\Components\Router\Route;
+use ZayMedia\Shared\Helpers\OpenApi\Security;
 use ZayMedia\Shared\Http\Middleware\Identity\Authenticate;
 use ZayMedia\Shared\Http\Response\JsonDataSuccessResponse;
 
@@ -21,7 +22,7 @@ use function App\Components\env;
     **Коды ошибок**:<br>
     **1** - Доступ запрещен<br>',
     summary: 'Отправка сообщения',
-    security: [['bearerAuth' => '{}']],
+    security: [Security::BEARER_AUTH],
     requestBody: new OA\RequestBody(
         required: true,
         content: new OA\JsonContent(

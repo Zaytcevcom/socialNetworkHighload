@@ -12,6 +12,7 @@ use Doctrine\Persistence\ObjectManager;
 use Exception;
 use Faker\Factory;
 
+/** @noinspection PhpUnused */
 final class UserFixture extends AbstractFixture
 {
     /** @throws Exception */
