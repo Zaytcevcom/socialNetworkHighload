@@ -28,6 +28,7 @@
         "monolog/monolog": "^3.0",
         "php-amqplib/php-amqplib": "^3.0",
         "php-di/php-di": "^7.0",
+        "promphp/prometheus_client_php": "^2.7",
         "psr/http-factory-implementation": "*",
         "ramsey/uuid": "^4.3",
         "sentry/sdk": "^3.2",

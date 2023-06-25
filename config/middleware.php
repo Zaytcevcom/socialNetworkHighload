@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use App\Components\MetricsREDEnd;
+use App\Components\MetricsREDStart;
 use Middlewares\ContentLanguage;
 use Slim\App;
 use Slim\Middleware\ErrorMiddleware;
@@ -9,6 +11,7 @@ use ZayMedia\Shared\Components\FeatureToggle\FeaturesMiddleware;
 use ZayMedia\Shared\Http\Middleware;
 
 return static function (App $app): void {
+    $app->add(MetricsREDEnd::class);
     $app->add(Middleware\Identity\Authenticate::class);
     // $app->add(Middleware\DomainExceptionHandler::class);
     $app->add(Middleware\AccessDeniedExceptionHandler::class);
@@ -26,4 +29,5 @@ return static function (App $app): void {
     $app->add(ContentLanguage::class);
     $app->addBodyParsingMiddleware();
     $app->add(ErrorMiddleware::class);
+    $app->add(MetricsREDStart::class);
 };

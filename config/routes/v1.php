@@ -8,6 +8,8 @@ use Slim\Routing\RouteCollectorProxy;
 use ZayMedia\Shared\Components\Router\StaticRouteGroup as Group;
 
 return static function (App $app): void {
+    $app->get('/metrics', Action\MetricsAction::class);
+
     $app->group('/v1', new Group(static function (RouteCollectorProxy $group): void {
         $group->get('', Action\V1\OpenApiAction::class);
 

@@ -3,6 +3,7 @@ services:
 
     nginx:
         container_name: hl-nginx
+        restart: always
         build:
             context: docker
             dockerfile: development/nginx/Dockerfile
@@ -148,7 +149,7 @@ services:
             MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
             MYSQL_DATABASE: ${DB_NAME}
         volumes:
-            - ./var/replication/semi-sync/source:/var/lib/mysql
+            - source_data:/var/lib/mysql
         networks:
             - hl-network
 
@@ -177,7 +178,7 @@ services:
             MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
             MYSQL_DATABASE: ${DB_NAME}
         volumes:
-            - ./var/replication/semi-sync/replica-1:/var/lib/mysql
+            - replica_1_data:/var/lib/mysql
         depends_on:
             - db-source
         networks:
@@ -193,7 +194,7 @@ services:
             MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
             MYSQL_DATABASE: ${DB_NAME}
         volumes:
-            - ./var/replication/semi-sync/replica-2:/var/lib/mysql
+            - replica_2_data:/var/lib/mysql
         depends_on:
             - db-source
         networks:
@@ -218,7 +219,7 @@ services:
         ports:
             - "6379:6379"
         volumes:
-            - ./var/redis:/data
+            - redis_data:/data
             - /etc/timezone:/etc/timezone:ro
             - /etc/localtime:/etc/localtime:ro
         networks:
@@ -233,7 +234,7 @@ services:
             RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
             RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS: -rabbit log_levels [{connection,error},{default,error}] disk_free_limit 2147483648
         volumes:
-            - ./var/rabbitmq:/var/lib/rabbitmq
+            - rabbitmq_data:/var/lib/rabbitmq
         ports:
             - "15672:15672"
             - "5672:5672"
@@ -304,6 +305,91 @@ services:
             - redis
             - rabbitmq
         command: composer app posts:consumer-refresh-feed-by-post
+
+    prometheus:
+        container_name: hl-prometheus
+        build:
+            context: docker
+            dockerfile: development/prometheus/Dockerfile
+        restart: always
+        ports:
+            - "9090:9090"
+        networks:
+            - hl-network
+
+    grafana:
+        container_name: hl-grafana
+        image: grafana/grafana
+        restart: always
+        ports:
+            - "3000:3000"
+        depends_on:
+            - prometheus
+        environment:
+            GF_SECURITY_ADMIN_PASSWORD: admin
+        volumes:
+            - grafana_data:/var/lib/grafana
+        networks:
+            - hl-network
+
+    zabbix-server:
+        container_name: hl-zabbix-server
+        image: zabbix/zabbix-server-mysql:alpine-6.4-latest
+        ports:
+            - "10051:10051"
+        environment:
+            ZBX_JAVAGATEWAY: "192.168.1.196"
+            DB_SERVER_HOST: "192.168.1.196"
+            DB_SERVER_PORT: "3316"
+            MYSQL_USER: "zabbix"
+            MYSQL_PASSWORD: "zabbix_pwd"
+            MYSQL_DATABASE: "zabbix"
+            MYSQL_ROOT_PASSWORD: "root_pwd"
+        networks:
+            - hl-network
+
+    zabbix-web:
+        container_name: hl-zabbix-web
+        image: zabbix/zabbix-web-nginx-mysql:alpine-6.4-latest
+        ports:
+            - "8051:8080"
+        environment:
+            ZBX_SERVER_HOST: "192.168.1.196"
+            DB_SERVER_HOST: "192.168.1.196"
+            DB_SERVER_PORT: "3316"
+            MYSQL_USER: "zabbix"
+            MYSQL_PASSWORD: "zabbix_pwd"
+            MYSQL_DATABASE: "zabbix"
+            MYSQL_ROOT_PASSWORD: "root_pwd"
+        networks:
+            - hl-network
+
+    zabbix-mysql:
+        container_name: hl-zabbix-mysql
+        image: mysql:latest
+        ports:
+            - "3316:3306"
+        environment:
+            MYSQL_USER: "zabbix"
+            MYSQL_PASSWORD: "zabbix_pwd"
+            MYSQL_DATABASE: "zabbix"
+            MYSQL_ROOT_PASSWORD: "root_pwd"
+        networks:
+            - hl-network
+
+    zabbix-java:
+        container_name: hl-zabbix-java
+        image: zabbix/zabbix-java-gateway:alpine-6.4-latest
+        networks:
+            - hl-network
+
+volumes:
+    source_data:
+    replica_1_data:
+    replica_2_data:
+    redis_data:
+    rabbitmq_data:
+    grafana_data:
 
 networks:
     hl-network:
